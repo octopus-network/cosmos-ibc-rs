@@ -21,8 +21,8 @@ profiling = []
 telemetry = ["ibc-telemetry"]
 
 [dependencies]
-ibc           = { version = "0.16.0", path = "../modules" }
-ibc-proto     = { version = "0.19.0", path = "../proto" }
+ibc           = { git  = "https://github.com/livelybug/ibc-rs.git", branch = 'dev'  }
+ibc-proto     = { git = "https://github.com/octopus-network/ibc-proto-rs.git", branch = "ics10" }
 ibc-telemetry = { version = "0.16.0", path = "../telemetry", optional = true }
 
 subtle-encoding = "0.5"
@@ -66,7 +66,7 @@ uuid = { version = "1.1.2", features = ["v4"] }
 
 
 jsonrpsee = { version = "0.14", features = ["macros", "ws-client", "http-client"] }
-octopusxt = { git = "https://github.com/octopus-network/octopusxt.git", branch = "dev" }
+octopusxt = { git = "https://github.com/octopus-network/octopusxt.git", branch = "ics10" }
 # octopusxt = { path = "../../octopusxt/module" }
 
 subxt = { git = "https://github.com/octopus-network/substrate-subxt.git", branch = 'master' }
@@ -77,7 +77,7 @@ beefy-light-client = { git = "https://github.com/octopus-network/beefy-light-cli
 sp-core = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.28" }
 sp-runtime = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.28" }
 ics23 = { version = "=0.8.0-alpha" }
-
+feignhttp = { version = "0.4" }
 
 [dependencies.num-bigint]
 version = "0.4"
@@ -108,8 +108,8 @@ default-features = false
 version = "=0.23.7"
 
 [dev-dependencies]
-ibc = { version = "0.16.0", path = "../modules", features = ["mocks"] }
-serial_test = "0.8.0"
+ibc = { git  = "https://github.com/livelybug/ibc-rs.git", branch = "dev", features = ["mocks"] }
+#serial_test = "0.8.0"
 env_logger = "0.9.0"
 tracing-subscriber = { version = "0.3.14", features = ["fmt", "env-filter", "json"] }
 test-log = { version = "0.2.10", features = ["trace"] }

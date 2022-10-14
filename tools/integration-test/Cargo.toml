@@ -14,10 +14,10 @@ description = """
 """
 
 [dependencies]
-ibc             = { path = "../../modules" }
+ibc             = { git  = "https://github.com/livelybug/ibc-rs.git", branch = 'dev' }
 ibc-relayer     = { path = "../../relayer" }
 ibc-relayer-cli = { path = "../../relayer-cli" }
-ibc-proto       = { path = "../../proto" }
+ibc-proto       = { git = "https://github.com/octopus-network/ibc-proto-rs.git", branch = "ics10"}
 ibc-test-framework = { path = "../test-framework" }
 tendermint      = { version = "=0.23.7" }
 tendermint-rpc  = { version = "=0.23.7", features = ["http-client", "websocket-client"] }

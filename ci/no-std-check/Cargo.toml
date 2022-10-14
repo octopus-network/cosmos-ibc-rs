@@ -5,8 +5,8 @@ edition = "2021"
 resolver = "2"
 
 [dependencies]
-ibc = { path = "../../modules", default-features = false }
-ibc-proto = { path = "../../proto", default-features = false }
+ibc = { git  = "https://github.com/livelybug/ibc-rs.git", branch = "dev", default-features = false }
+ibc-proto = { git = "https://github.com/octopus-network/ibc-proto-rs.git", branch = "ics10", default-features = false  }
 tendermint = { version = "0.23.7", default-features = false }
 tendermint-proto = { version = "0.23.7", default-features = false }
 tendermint-light-client-verifier = { version = "0.23.7", default-features = false }

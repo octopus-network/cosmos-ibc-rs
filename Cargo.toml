@@ -3,12 +3,10 @@
 resolver = "2"
 
 members = [
-    "modules",
     "relayer",
     "relayer-cli",
     "relayer-rest",
     "telemetry",
-    "proto",
     "tools/integration-test",
     "tools/test-framework",
 ]
@@ -180,8 +178,5 @@ sp-keyring = { git = "https://github.com/paritytech/substrate.git", branch = "po
 # substrate-wasm-builder = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.28" }
 # substrate-build-script-utils = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.28" }
 
-[patch."https://github.com/octopus-network/ibc-rs"]
-ibc = { path = "./modules" }
-ibc-proto = { path = "./proto" }
-
-
+[patch."https://github.com/livelybug/ibc-rs"]
+ibc-proto = { git = "https://github.com/octopus-network/ibc-proto-rs.git", branch = "ics10", default-features = false  }

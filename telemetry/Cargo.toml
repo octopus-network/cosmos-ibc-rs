@@ -13,7 +13,7 @@ description  = """
 """
 
 [dependencies]
-ibc = { version = "0.16.0", path = "../modules" }
+ibc = { git  = "https://github.com/livelybug/ibc-rs.git", branch = "dev" }
 
 crossbeam-channel        = "0.5.5"
 once_cell                = "1.13.0"

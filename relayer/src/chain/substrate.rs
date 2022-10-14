@@ -2046,12 +2046,14 @@ pub fn get_dummy_merkle_proof() -> MerkleProof {
     MerkleProof { proofs: mproofs }
 }
 
-pub fn get_dummy_ics07_header() -> tHeader {
+use feignhttp::get;
+#[get("https://github.com/livelybug/ibc-rs/blob/dev/modules/tests/support/signed_header.json")]
+async fn get_singed_header() -> feignhttp::Result<String> {}
+
+pub async fn get_dummy_ics07_header() -> tHeader {
     use tendermint::block::signed_header::SignedHeader;
-    // Build a SignedHeader from a JSON file.
-    let shdr = serde_json::from_str::<SignedHeader>(include_str!(
-        "../../../modules/tests/support/signed_header.json"
-    ))
+    let singed_header = get_singed_header().await.unwrap();
+    let shdr = serde_json::from_str::<SignedHeader>(&singed_header)
     .unwrap();
 
     // Build a set of validators.
