@@ -215,6 +215,8 @@ impl MockContext {
                 // Return the tuple.
                 (Some(client_state), light_block.into())
             }
+            // TODO(davirian) for Grandpa client
+            ClientType::Grandpa => todo!(),
         };
         let consensus_states = vec![(cs_height, consensus_state)].into_iter().collect();
 
@@ -266,6 +268,8 @@ impl MockContext {
                 // Return the tuple.
                 (Some(client_state), light_block.into())
             }
+            // TODO(davirian) for Grandpa client
+            ClientType::Grandpa => todo!(),
         };
 
         let prev_consensus_state = match client_type {
@@ -280,6 +284,8 @@ impl MockContext {
                 );
                 light_block.into()
             }
+            // TODO(davirian) for Grandpa client
+            ClientType::Grandpa => todo!(),
         };
 
         let consensus_states = vec![
