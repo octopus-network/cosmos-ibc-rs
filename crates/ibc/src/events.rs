@@ -1,6 +1,8 @@
 use crate::prelude::*;
 
 use core::convert::{TryFrom, TryInto};
+use core::fmt::{Display, Formatter};
+use core::fmt::Error as FmtError;
 use core::str::FromStr;
 use flex_error::{define_error, TraceError};
 use serde_derive::{Deserialize, Serialize};
@@ -19,6 +21,7 @@ use crate::core::ics04_channel::packet::Packet;
 use crate::core::ics24_host::error::ValidationError;
 use crate::core::ics26_routing::context::ModuleId;
 use crate::timestamp::ParseTimestampError;
+use crate::utils::pretty::PrettySlice;
 
 define_error! {
     Error {
@@ -340,6 +343,18 @@ pub struct ModuleEvent {
     pub attributes: Vec<ModuleEventAttribute>,
 }
 
+impl Display for ModuleEvent {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), FmtError> {
+        write!(
+            f,
+            "ModuleEvent {{ kind: {}, module_name: {}, attributes: {} }}",
+            self.kind,
+            self.module_name,
+            PrettySlice(&self.attributes)
+        )
+    }
+}
+
 impl TryFrom<ModuleEvent> for AbciEvent {
     type Error = Error;
 
@@ -366,6 +381,16 @@ impl From<ModuleEvent> for IbcEvent {
 pub struct ModuleEventAttribute {
     pub key: String,
     pub value: String,
+}
+
+impl Display for ModuleEventAttribute {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), FmtError> {
+        write!(
+            f,
+            "ModuleEventAttribute {{ key: {}, value: {} }}",
+            self.key, self.value
+        )
+    }
 }
 
 impl<K: ToString, V: ToString> From<(K, V)> for ModuleEventAttribute {
