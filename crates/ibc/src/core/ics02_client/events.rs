@@ -1,6 +1,7 @@
 //! Types for the IBC events emitted from Tendermint Websocket by the client module.
 
 use core::fmt::{Display, Formatter};
+use serde::{Deserialize, Serialize};
 use derive_more::From;
 use ibc_proto::google::protobuf::Any;
 use subtle_encoding::hex;
@@ -27,7 +28,7 @@ pub const CONSENSUS_HEIGHTS_ATTRIBUTE_KEY: &str = "consensus_heights";
 /// The content of the `key` field for the header in update client event.
 pub const HEADER_ATTRIBUTE_KEY: &str = "header";
 
-#[derive(Debug, From, Clone)]
+#[derive(Debug, From, Clone, Deserialize, Serialize)]
 struct ClientIdAttribute {
     client_id: ClientId,
 }
@@ -47,7 +48,7 @@ impl Display for ClientIdAttribute {
     }
 }
 
-#[derive(Debug, From, Clone)]
+#[derive(Debug, From, Clone, Deserialize, Serialize)]
 struct ClientTypeAttribute {
     client_type: ClientType,
 }
@@ -67,7 +68,7 @@ impl Display for ClientTypeAttribute {
     }
 }
 
-#[derive(Debug, From, Clone)]
+#[derive(Debug, From, Clone, Deserialize, Serialize)]
 struct ConsensusHeightAttribute {
     consensus_height: Height,
 }
@@ -89,7 +90,7 @@ impl Display for ConsensusHeightAttribute {
 }
 
 
-#[derive(Debug, From, Clone)]
+#[derive(Debug, From, Clone, Deserialize, Serialize)]
 struct ConsensusHeightsAttribute {
     consensus_heights: Vec<Height>,
 }
@@ -108,7 +109,7 @@ impl From<ConsensusHeightsAttribute> for Tag {
     }
 }
 
-#[derive(Debug, From, Clone)]
+#[derive(Debug, From, Clone, Deserialize, Serialize)]
 struct HeaderAttribute {
     header: Any,
 }
@@ -126,7 +127,7 @@ impl From<HeaderAttribute> for Tag {
 }
 
 /// CreateClient event signals the creation of a new on-chain client (IBC client).
-#[derive(Debug,Clone)]
+#[derive(Debug,Clone, Deserialize, Serialize)]
 pub struct CreateClient {
     client_id: ClientIdAttribute,
     client_type: ClientTypeAttribute,
@@ -180,7 +181,7 @@ impl Display for CreateClient {
 }
 
 /// UpdateClient event signals a recent update of an on-chain client (IBC Client).
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct UpdateClient {
     client_id: ClientIdAttribute,
     client_type: ClientTypeAttribute,
@@ -257,7 +258,7 @@ impl Display for UpdateClient {
 
 /// ClientMisbehaviour event signals the update of an on-chain client (IBC Client) with evidence of
 /// misbehaviour.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct ClientMisbehaviour {
     client_id: ClientIdAttribute,
     client_type: ClientTypeAttribute,
@@ -300,7 +301,7 @@ impl Display for ClientMisbehaviour {
 }
 
 /// Signals a recent upgrade of an on-chain client (IBC Client).
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct UpgradeClient {
     client_id: ClientIdAttribute,
     client_type: ClientTypeAttribute,
