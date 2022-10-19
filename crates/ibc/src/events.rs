@@ -207,7 +207,7 @@ impl FromStr for IbcEventType {
 }
 
 /// Events created by the IBC component of a chain, destined for a relayer.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum IbcEvent {
     CreateClient(ClientEvents::CreateClient),
     UpdateClient(ClientEvents::UpdateClient),

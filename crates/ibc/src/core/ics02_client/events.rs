@@ -26,7 +26,7 @@ pub const CONSENSUS_HEIGHTS_ATTRIBUTE_KEY: &str = "consensus_heights";
 /// The content of the `key` field for the header in update client event.
 pub const HEADER_ATTRIBUTE_KEY: &str = "header";
 
-#[derive(Debug, From)]
+#[derive(Debug, From, Clone)]
 struct ClientIdAttribute {
     client_id: ClientId,
 }
@@ -40,7 +40,7 @@ impl From<ClientIdAttribute> for Tag {
     }
 }
 
-#[derive(Debug, From)]
+#[derive(Debug, From, Clone)]
 struct ClientTypeAttribute {
     client_type: ClientType,
 }
@@ -54,7 +54,7 @@ impl From<ClientTypeAttribute> for Tag {
     }
 }
 
-#[derive(Debug, From)]
+#[derive(Debug, From, Clone)]
 struct ConsensusHeightAttribute {
     consensus_height: Height,
 }
@@ -68,7 +68,7 @@ impl From<ConsensusHeightAttribute> for Tag {
     }
 }
 
-#[derive(Debug, From)]
+#[derive(Debug, From, Clone)]
 struct ConsensusHeightsAttribute {
     consensus_heights: Vec<Height>,
 }
@@ -87,7 +87,7 @@ impl From<ConsensusHeightsAttribute> for Tag {
     }
 }
 
-#[derive(Debug, From)]
+#[derive(Debug, From, Clone)]
 struct HeaderAttribute {
     header: Any,
 }
@@ -105,7 +105,7 @@ impl From<HeaderAttribute> for Tag {
 }
 
 /// CreateClient event signals the creation of a new on-chain client (IBC client).
-#[derive(Debug)]
+#[derive(Debug,Clone)]
 pub struct CreateClient {
     client_id: ClientIdAttribute,
     client_type: ClientTypeAttribute,
@@ -148,7 +148,7 @@ impl From<CreateClient> for AbciEvent {
 }
 
 /// UpdateClient event signals a recent update of an on-chain client (IBC Client).
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UpdateClient {
     client_id: ClientIdAttribute,
     client_type: ClientTypeAttribute,
@@ -214,7 +214,7 @@ impl From<UpdateClient> for AbciEvent {
 
 /// ClientMisbehaviour event signals the update of an on-chain client (IBC Client) with evidence of
 /// misbehaviour.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ClientMisbehaviour {
     client_id: ClientIdAttribute,
     client_type: ClientTypeAttribute,
@@ -247,7 +247,7 @@ impl From<ClientMisbehaviour> for AbciEvent {
 }
 
 /// Signals a recent upgrade of an on-chain client (IBC Client).
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UpgradeClient {
     client_id: ClientIdAttribute,
     client_type: ClientTypeAttribute,
