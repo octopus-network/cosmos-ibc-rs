@@ -1,5 +1,6 @@
 //! Types for the IBC events emitted from Tendermint Websocket by the client module.
 
+use core::fmt::{Display, Formatter};
 use derive_more::From;
 use ibc_proto::google::protobuf::Any;
 use subtle_encoding::hex;
@@ -40,6 +41,12 @@ impl From<ClientIdAttribute> for Tag {
     }
 }
 
+impl Display for ClientIdAttribute {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        write!(f, "ClientIdAttribute {{ {} }}", self.client_id)
+    }
+}
+
 #[derive(Debug, From, Clone)]
 struct ClientTypeAttribute {
     client_type: ClientType,
@@ -51,6 +58,12 @@ impl From<ClientTypeAttribute> for Tag {
             key: CLIENT_TYPE_ATTRIBUTE_KEY.parse().unwrap(),
             value: attr.client_type.to_string().parse().unwrap(),
         }
+    }
+}
+
+impl Display for ClientTypeAttribute {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        write!(f, "ClientTypeAttribute {{ {} }}", self.client_type)
     }
 }
 
@@ -67,6 +80,14 @@ impl From<ConsensusHeightAttribute> for Tag {
         }
     }
 }
+
+
+impl Display for ConsensusHeightAttribute {
+    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
+        write!(f, "ConsensusHeightAttribute {{ {} }}", self.consensus_height)
+    }
+}
+
 
 #[derive(Debug, From, Clone)]
 struct ConsensusHeightsAttribute {
@@ -147,6 +168,17 @@ impl From<CreateClient> for AbciEvent {
     }
 }
 
+
+impl Display for CreateClient {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), core::fmt::Error> {
+        write!(
+            f,
+            "CreateClient {{ client_id: {}, client_type: {}, consensus_height: {} }}",
+            self.client_id, self.client_type, self.consensus_height
+        )
+    }
+}
+
 /// UpdateClient event signals a recent update of an on-chain client (IBC Client).
 #[derive(Debug, Clone)]
 pub struct UpdateClient {
@@ -212,6 +244,17 @@ impl From<UpdateClient> for AbciEvent {
     }
 }
 
+impl Display for UpdateClient {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), core::fmt::Error> {
+        // TODO Display: Check for a solution for Box<dyn Header>
+        write!(
+            f,
+            "UpdateClient {{ client_id: {}, client_type: {}, consensus_height: {}, consensus_heights: {:?}, header: None }}",
+            self.client_id, self.client_type, self.consensus_height, self.consensus_heights
+        )
+    }
+}
+
 /// ClientMisbehaviour event signals the update of an on-chain client (IBC Client) with evidence of
 /// misbehaviour.
 #[derive(Debug, Clone)]
@@ -243,6 +286,16 @@ impl From<ClientMisbehaviour> for AbciEvent {
             type_str: IbcEventType::ClientMisbehaviour.as_str().to_string(),
             attributes: vec![c.client_id.into(), c.client_type.into()],
         }
+    }
+}
+
+impl Display for ClientMisbehaviour {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), core::fmt::Error> {
+        write!(
+            f,
+            "ClientMisbehaviour {{ client_id: {}, client_type: {} }}",
+            self.client_id, self.client_type
+        )
     }
 }
 
@@ -286,5 +339,16 @@ impl From<UpgradeClient> for AbciEvent {
                 u.consensus_height.into(),
             ],
         }
+    }
+}
+
+
+impl Display for UpgradeClient {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result<(), core::fmt::Error> {
+        write!(
+            f,
+            "UpgradeClient {{ client_id: {}, client_type: {}, consensus_height: {} }}",
+            self.client_id, self.client_type, self.consensus_height
+        )
     }
 }
