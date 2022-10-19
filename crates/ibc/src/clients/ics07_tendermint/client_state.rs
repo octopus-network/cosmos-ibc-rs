@@ -247,6 +247,10 @@ impl ClientState {
             _ => Ok(()),
         }
     }
+
+    pub fn unbonding_period(&self) -> &Duration {
+        &self.unbonding_period
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
