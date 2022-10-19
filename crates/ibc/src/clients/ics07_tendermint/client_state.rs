@@ -251,6 +251,18 @@ impl ClientState {
     pub fn unbonding_period(&self) -> &Duration {
         &self.unbonding_period
     }
+
+    pub fn max_clock_drift(&self) -> &Duration {
+        &self.max_clock_drift
+    }
+
+    pub fn trusting_period(&self) -> &Duration {
+        &self.trusting_period
+    }
+
+    pub fn trust_level(&self) -> &TrustThreshold {
+        &self.trust_level
+    }
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
