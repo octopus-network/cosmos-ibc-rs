@@ -8,7 +8,7 @@
 // deprecated fields. See issue #143.
 #![allow(deprecated)]
 #![deny(
-    warnings,
+    // warnings,
     trivial_casts,
     trivial_numeric_casts,
     unused_import_braces,

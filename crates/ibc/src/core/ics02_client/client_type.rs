@@ -46,7 +46,7 @@ impl core::str::FromStr for ClientType {
         match s {
             Self::TENDERMINT_STR => Ok(Self::Tendermint),
             Self::GRANDPA_STR => Ok(Self::Grandpa),
-            
+
             #[cfg(any(test, feature = "mocks"))]
             Self::MOCK_STR => Ok(Self::Mock),
 
