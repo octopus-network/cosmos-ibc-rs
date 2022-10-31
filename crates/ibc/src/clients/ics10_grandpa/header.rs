@@ -19,6 +19,8 @@ use crate::Height;
 use tendermint::Time;
 use tendermint_proto::google::protobuf as tpb;
 
+use super::client_type as gp_client_type;
+
 pub const GRANDPA_HEADER_TYPE_URL: &str = "/ibc.lightclients.grandpa.v1.Header";
 
 /// Tendermint consensus header
@@ -65,7 +67,7 @@ impl Header {
 
 impl crate::core::ics02_client::header::Header for Header {
     fn client_type(&self) -> ClientType {
-        ClientType::Grandpa
+        gp_client_type()
     }
 
     fn height(&self) -> Height {

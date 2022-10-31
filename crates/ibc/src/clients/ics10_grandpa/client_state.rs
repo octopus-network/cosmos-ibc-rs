@@ -48,6 +48,8 @@ use codec::{Decode, Encode};
 use frame_support::{storage::storage_prefix, Blake2_128Concat, StorageHasher};
 use ibc_proto::protobuf::Protobuf;
 
+use super::client_type as gp_client_type;
+
 pub const GRANDPA_CLIENT_STATE_TYPE_URL: &str = "/ibc.lightclients.grandpa.v1.ClientState";
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -168,7 +170,7 @@ impl Ics2ClientState for ClientState {
     }
 
     fn client_type(&self) -> ClientType {
-        ClientType::Grandpa
+        gp_client_type()
     }
 
     fn latest_height(&self) -> Height {
@@ -738,12 +740,12 @@ fn verify_delay_passed(
 fn downcast_gp_client_state(cs: &dyn Ics2ClientState) -> Result<&ClientState, Ics02Error> {
     cs.as_any()
         .downcast_ref::<ClientState>()
-        .ok_or_else(|| Ics02Error::client_args_type_mismatch(ClientType::Grandpa))
+        .ok_or_else(|| Ics02Error::client_args_type_mismatch(gp_client_type()))
 }
 
 fn downcast_gp_consensus_state(cs: &dyn ConsensusState) -> Result<GpConsensusState, Ics02Error> {
     cs.as_any()
         .downcast_ref::<GpConsensusState>()
-        .ok_or_else(|| Ics02Error::client_args_type_mismatch(ClientType::Grandpa))
+        .ok_or_else(|| Ics02Error::client_args_type_mismatch(gp_client_type()))
         .map(Clone::clone)
 }
