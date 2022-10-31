@@ -667,7 +667,7 @@ fn get_storage_via_proof(
         sp_trie::StorageProof::new(storage_proof.proof),
         &storage_keys,
     )
-    .map_err(|e| Ics02Error::client_specific(e.to_string()))?
+    .map_err(|_| Ics02Error::client_specific("Read Proof Check Error".to_string()))?
     .ok_or(Ics02Error::client_specific("empty proof".to_string()))?;
 
     let storage_result = <Vec<u8> as Decode>::decode(&mut &storage_result[..])
