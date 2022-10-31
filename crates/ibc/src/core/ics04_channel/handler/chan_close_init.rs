@@ -73,10 +73,10 @@ mod tests {
     use crate::core::ics04_channel::msgs::chan_close_init::test_util::get_dummy_raw_msg_chan_close_init;
     use crate::core::ics04_channel::msgs::chan_close_init::MsgChannelCloseInit;
     use crate::core::ics04_channel::msgs::ChannelMsg;
+    use crate::core::ics26_routing::handler::MsgReceipt;
     use crate::events::IbcEvent;
     use crate::prelude::*;
 
-    use crate::core::ics02_client::client_type::ClientType;
     use crate::core::ics03_connection::connection::ConnectionEnd;
     use crate::core::ics03_connection::connection::Counterparty as ConnectionCounterparty;
     use crate::core::ics03_connection::connection::State as ConnectionState;
@@ -89,12 +89,13 @@ mod tests {
     use crate::core::ics04_channel::Version;
     use crate::core::ics24_host::identifier::{ClientId, ConnectionId};
 
+    use crate::mock::client_state::client_type as mock_client_type;
     use crate::mock::context::MockContext;
     use crate::timestamp::ZERO_DURATION;
 
     #[test]
     fn chan_close_init_event_height() {
-        let client_id = ClientId::new(ClientType::Mock, 24).unwrap();
+        let client_id = ClientId::new(mock_client_type(), 24).unwrap();
         let conn_id = ConnectionId::new(2);
 
         let conn_end = ConnectionEnd::new(
@@ -133,13 +134,12 @@ mod tests {
                 )
         };
 
-        let (handler_output_builder, _) =
+        let (MsgReceipt { events, log: _ }, _) =
             channel_dispatch(&context, &ChannelMsg::ChannelCloseInit(msg_chan_close_init)).unwrap();
-        let handler_output = handler_output_builder.with_result(());
 
-        assert!(!handler_output.events.is_empty()); // Some events must exist.
+        assert!(!events.is_empty()); // Some events must exist.
 
-        for event in handler_output.events.iter() {
+        for event in events.iter() {
             assert!(matches!(event, &IbcEvent::CloseInitChannel(_)));
         }
     }
