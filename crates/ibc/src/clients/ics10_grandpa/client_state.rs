@@ -663,7 +663,7 @@ fn get_storage_via_proof(
     let state_root = vector_to_array::<u8, 32>(state_root);
 
     let storage_result = read_proof_check::<sp_runtime::traits::BlakeTwo256>(
-        sp_runtime::testing::H256::from(state_root),
+        sp_core::H256::from(state_root),
         sp_trie::StorageProof::new(storage_proof.proof),
         &storage_keys,
     )

@@ -32,6 +32,7 @@ std = [
     "sp-io/std",
     "sp-trie/std",
     "sp-runtime/std",
+    "sp-core/std",
 ]
 clock = ["tendermint/clock", "time/std"]
 
@@ -71,6 +72,7 @@ sp-std = { git = "https://github.com/paritytech/substrate.git", branch = "polkad
 sp-trie = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.30", default-features = false }
 sp-io = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.30", default-features = false }
 sp-runtime = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.30", default-features = false }
+sp-core = { git = "https://github.com/paritytech/substrate.git", branch = "polkadot-v0.9.30", default-features = false }
 
 [dependencies.tendermint]
 version = "=0.25.0"
