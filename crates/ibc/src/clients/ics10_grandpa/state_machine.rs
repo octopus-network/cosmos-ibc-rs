@@ -29,7 +29,7 @@ where
     let db = create_proof_check_backend_storage::<H>(proof);
 
     if db.contains(&root, EMPTY_PREFIX) {
-        read_trie_value::<LayoutV0<H>, _>(&db, &root, key)
+        read_trie_value::<LayoutV0<H>, _>(&db, &root, key, None, None)
     } else {
         Err(Box::new(TrieError::<LayoutV0<H>>::InvalidStateRoot(root)))
     }
