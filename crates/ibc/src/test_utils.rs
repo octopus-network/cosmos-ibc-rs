@@ -1,4 +1,5 @@
-use std::sync::{Arc, Mutex};
+use alloc::sync::Arc;
+use parking_lot::Mutex;
 
 use subtle_encoding::bech32;
 use tendermint::{block, consensus, evidence, public_key::Algorithm};
@@ -126,7 +127,6 @@ impl TokenTransferKeeper for DummyTransferModule {
     ) -> Result<(), PacketError> {
         self.ibc_store
             .lock()
-            .unwrap()
             .packet_commitment
             .entry(port_id)
             .or_default()
@@ -144,7 +144,6 @@ impl TokenTransferKeeper for DummyTransferModule {
     ) -> Result<(), PacketError> {
         self.ibc_store
             .lock()
-            .unwrap()
             .next_sequence_send
             .entry(port_id)
             .or_default()
@@ -222,7 +221,6 @@ impl SendPacketReader for DummyTransferModule {
         match self
             .ibc_store
             .lock()
-            .unwrap()
             .channels
             .get(port_id)
             .and_then(|map| map.get(channel_id))
@@ -236,7 +234,7 @@ impl SendPacketReader for DummyTransferModule {
     }
 
     fn connection_end(&self, cid: &ConnectionId) -> Result<ConnectionEnd, PacketError> {
-        match self.ibc_store.lock().unwrap().connections.get(cid) {
+        match self.ibc_store.lock().connections.get(cid) {
             Some(connection_end) => Ok(connection_end.clone()),
             None => Err(ConnectionError::ConnectionNotFound {
                 connection_id: cid.clone(),
@@ -246,7 +244,7 @@ impl SendPacketReader for DummyTransferModule {
     }
 
     fn client_state(&self, client_id: &ClientId) -> Result<Box<dyn ClientState>, PacketError> {
-        match self.ibc_store.lock().unwrap().clients.get(client_id) {
+        match self.ibc_store.lock().clients.get(client_id) {
             Some(client_record) => {
                 client_record
                     .client_state
@@ -267,7 +265,7 @@ impl SendPacketReader for DummyTransferModule {
         client_id: &ClientId,
         height: Height,
     ) -> Result<Box<dyn ConsensusState>, PacketError> {
-        match self.ibc_store.lock().unwrap().clients.get(client_id) {
+        match self.ibc_store.lock().clients.get(client_id) {
             Some(client_record) => match client_record.consensus_states.get(&height) {
                 Some(consensus_state) => Ok(consensus_state.clone()),
                 None => Err(ClientError::ConsensusStateNotFound {
@@ -291,7 +289,6 @@ impl SendPacketReader for DummyTransferModule {
         match self
             .ibc_store
             .lock()
-            .unwrap()
             .next_sequence_send
             .get(port_id)
             .and_then(|map| map.get(channel_id))
