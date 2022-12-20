@@ -1697,7 +1697,7 @@ mod tests {
     }
 }
 
-#[cfg(any(test, feature = "mocks"))]
+#[cfg(test)]
 pub mod test_util {
     use crate::prelude::*;
     use core::time::Duration;
