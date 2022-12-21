@@ -45,7 +45,8 @@ val_exec_ctx = []
 
 # This feature grants access to development-time mocking libraries, such as `MockContext` or `MockHeader`.
 # Depends on the `testgen` suite for generating Tendermint light blocks.
-mocks = []
+mocks = ["tendermint-testgen", "clock"]
+mocks-primitives = []
 
 [dependencies]
 # Proto definitions for all IBC-related interfaces, e.g., connections or channels.
