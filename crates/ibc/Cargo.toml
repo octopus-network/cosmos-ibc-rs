@@ -75,6 +75,7 @@ scale-info = { version = "2.1.2", default-features = false, features = ["derive"
 ## for borsh encode or decode
 borsh = {version = "0.9.3", default-features = false, optional = true }
 parking_lot = { version = "0.12.1", default-features = false }
+cfg-if = "1.0.0"
 
 [dependencies.tendermint]
 version = "0.28"
