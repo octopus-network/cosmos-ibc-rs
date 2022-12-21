@@ -78,7 +78,7 @@ impl MockHeader {
             Self {
                 height,
                 timestamp: Timestamp::now(),
-            };
+            }
         }
         #[cfg(any(test,feature = "mocks-primitives"))] 
         {
