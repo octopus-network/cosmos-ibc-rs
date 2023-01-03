@@ -75,7 +75,7 @@ impl From<Attributes> for Vec<abci::EventAttribute> {
     feature = "borsh",
     derive(borsh::BorshSerialize, borsh::BorshDeserialize)
 )]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct OpenInit(Attributes);
 
 impl OpenInit {
@@ -128,7 +128,7 @@ impl From<OpenInit> for abci::Event {
     feature = "borsh",
     derive(borsh::BorshSerialize, borsh::BorshDeserialize)
 )]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct OpenTry(Attributes);
 
 impl OpenTry {
@@ -182,7 +182,7 @@ impl From<OpenTry> for abci::Event {
     feature = "borsh",
     derive(borsh::BorshSerialize, borsh::BorshDeserialize)
 )]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct OpenAck(Attributes);
 
 impl OpenAck {
@@ -236,7 +236,7 @@ impl From<OpenAck> for abci::Event {
     feature = "borsh",
     derive(borsh::BorshSerialize, borsh::BorshDeserialize)
 )]
-#[derive(Clone, Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct OpenConfirm(Attributes);
 
 impl OpenConfirm {

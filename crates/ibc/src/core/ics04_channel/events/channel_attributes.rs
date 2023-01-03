@@ -30,7 +30,7 @@ const VERSION_ATTRIBUTE_KEY: &str = "version";
     feature = "borsh",
     derive(borsh::BorshSerialize, borsh::BorshDeserialize)
 )]
-#[derive(Debug, From, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Debug, From, Serialize, Deserialize, PartialEq, Eq)]
 pub struct PortIdAttribute {
     pub port_id: PortId,
 }
@@ -76,7 +76,7 @@ impl From<ChannelIdAttribute> for abci::EventAttribute {
     feature = "borsh",
     derive(borsh::BorshSerialize, borsh::BorshDeserialize)
 )]
-#[derive(Debug, From, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Debug, From, Serialize, Deserialize, PartialEq, Eq)]
 pub struct CounterpartyPortIdAttribute {
     pub counterparty_port_id: PortId,
 }
@@ -103,7 +103,7 @@ impl From<CounterpartyPortIdAttribute> for abci::EventAttribute {
     feature = "borsh",
     derive(borsh::BorshSerialize, borsh::BorshDeserialize)
 )]
-#[derive(Debug, From, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Debug, From, Serialize, Deserialize, PartialEq, Eq)]
 pub struct CounterpartyChannelIdAttribute {
     pub counterparty_channel_id: ChannelId,
 }
@@ -136,7 +136,7 @@ impl AsRef<ChannelId> for CounterpartyChannelIdAttribute {
     feature = "borsh",
     derive(borsh::BorshSerialize, borsh::BorshDeserialize)
 )]
-#[derive(Debug, From, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Debug, From, Serialize, Deserialize, PartialEq, Eq)]
 pub struct ConnectionIdAttribute {
     pub connection_id: ConnectionId,
 }
@@ -159,7 +159,7 @@ impl From<ConnectionIdAttribute> for abci::EventAttribute {
     feature = "borsh",
     derive(borsh::BorshSerialize, borsh::BorshDeserialize)
 )]
-#[derive(Debug, From, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Debug, From, Serialize, Deserialize, PartialEq, Eq)]
 pub struct VersionAttribute {
     pub version: Version,
 }

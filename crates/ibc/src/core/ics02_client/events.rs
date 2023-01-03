@@ -38,7 +38,7 @@ pub const HEADER_ATTRIBUTE_KEY: &str = "header";
     feature = "borsh",
     derive(borsh::BorshSerialize, borsh::BorshDeserialize)
 )]
-#[derive(Debug, From, Serialize, Deserialize)]
+#[derive(Clone, Debug, From, Serialize, Deserialize, PartialEq, Eq)]
 struct ClientIdAttribute {
     client_id: ClientId,
 }
@@ -61,7 +61,7 @@ impl From<ClientIdAttribute> for abci::EventAttribute {
     feature = "borsh",
     derive(borsh::BorshSerialize, borsh::BorshDeserialize)
 )]
-#[derive(Debug, From, Serialize, Deserialize, PartialEq, Eq)]
+#[derive(Clone, Debug, From, Serialize, Deserialize, PartialEq, Eq)]
 struct ClientTypeAttribute {
     client_type: ClientType,
 }
@@ -84,7 +84,7 @@ impl From<ClientTypeAttribute> for abci::EventAttribute {
     feature = "borsh",
     derive(borsh::BorshSerialize, borsh::BorshDeserialize)
 )]
-#[derive(Debug, From, Serialize, Deserialize)]
+#[derive(Clone, Debug, From, Serialize, Deserialize, PartialEq, Eq)]
 struct ConsensusHeightAttribute {
     consensus_height: Height,
 }
@@ -107,7 +107,7 @@ impl From<ConsensusHeightAttribute> for abci::EventAttribute {
     feature = "borsh",
     derive(borsh::BorshSerialize, borsh::BorshDeserialize)
 )]
-#[derive(Debug, From, Serialize, Deserialize)]
+#[derive(Clone, Debug, From, Serialize, Deserialize, PartialEq, Eq)]
 struct ConsensusHeightsAttribute {
     consensus_heights: Vec<Height>,
 }
@@ -123,7 +123,7 @@ impl From<ConsensusHeightsAttribute> for abci::EventAttribute {
     }
 }
 
-#[derive(Debug, From, Serialize, Deserialize)]
+#[derive(Clone, Debug, From, Serialize, Deserialize, PartialEq, Eq)]
 struct HeaderAttribute {
     header: Any,
 }
@@ -241,7 +241,7 @@ impl From<HeaderAttribute> for abci::EventAttribute {
     feature = "borsh",
     derive(borsh::BorshSerialize, borsh::BorshDeserialize)
 )]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct CreateClient {
     client_id: ClientIdAttribute,
     client_type: ClientTypeAttribute,
@@ -296,7 +296,7 @@ impl From<CreateClient> for abci::Event {
     feature = "borsh",
     derive(borsh::BorshSerialize, borsh::BorshDeserialize)
 )]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct UpdateClient {
     client_id: ClientIdAttribute,
     client_type: ClientTypeAttribute,
@@ -374,7 +374,7 @@ impl From<UpdateClient> for abci::Event {
     feature = "borsh",
     derive(borsh::BorshSerialize, borsh::BorshDeserialize)
 )]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct ClientMisbehaviour {
     client_id: ClientIdAttribute,
     client_type: ClientTypeAttribute,
@@ -419,7 +419,7 @@ impl From<ClientMisbehaviour> for abci::Event {
     feature = "borsh",
     derive(borsh::BorshSerialize, borsh::BorshDeserialize)
 )]
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct UpgradeClient {
     client_id: ClientIdAttribute,
     client_type: ClientTypeAttribute,
