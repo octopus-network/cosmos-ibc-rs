@@ -7,6 +7,7 @@ use crate::core::{
     ics04_channel::Version,
     ics24_host::identifier::{ChannelId, ConnectionId, PortId},
 };
+use serde_derive::{Deserialize, Serialize};
 
 const CONNECTION_ID_ATTRIBUTE_KEY: &str = "connection_id";
 const CHANNEL_ID_ATTRIBUTE_KEY: &str = "channel_id";
@@ -17,7 +18,19 @@ pub const COUNTERPARTY_CHANNEL_ID_ATTRIBUTE_KEY: &str = "counterparty_channel_id
 const COUNTERPARTY_PORT_ID_ATTRIBUTE_KEY: &str = "counterparty_port_id";
 const VERSION_ATTRIBUTE_KEY: &str = "version";
 
-#[derive(Debug, From)]
+#[cfg_attr(
+    feature = "parity-scale-codec",
+    derive(
+        parity_scale_codec::Encode,
+        parity_scale_codec::Decode,
+        scale_info::TypeInfo
+    )
+)]
+#[cfg_attr(
+    feature = "borsh",
+    derive(borsh::BorshSerialize, borsh::BorshDeserialize)
+)]
+#[derive(Debug, From, Serialize, Deserialize, PartialEq, Eq)]
 pub struct PortIdAttribute {
     pub port_id: PortId,
 }
@@ -28,7 +41,19 @@ impl From<PortIdAttribute> for abci::EventAttribute {
     }
 }
 
-#[derive(Clone, Debug, From)]
+#[cfg_attr(
+    feature = "parity-scale-codec",
+    derive(
+        parity_scale_codec::Encode,
+        parity_scale_codec::Decode,
+        scale_info::TypeInfo
+    )
+)]
+#[cfg_attr(
+    feature = "borsh",
+    derive(borsh::BorshSerialize, borsh::BorshDeserialize)
+)]
+#[derive(Clone, Debug, From, Serialize, Deserialize, PartialEq, Eq)]
 pub struct ChannelIdAttribute {
     pub channel_id: ChannelId,
 }
@@ -39,7 +64,19 @@ impl From<ChannelIdAttribute> for abci::EventAttribute {
     }
 }
 
-#[derive(Debug, From)]
+#[cfg_attr(
+    feature = "parity-scale-codec",
+    derive(
+        parity_scale_codec::Encode,
+        parity_scale_codec::Decode,
+        scale_info::TypeInfo
+    )
+)]
+#[cfg_attr(
+    feature = "borsh",
+    derive(borsh::BorshSerialize, borsh::BorshDeserialize)
+)]
+#[derive(Debug, From, Serialize, Deserialize, PartialEq, Eq)]
 pub struct CounterpartyPortIdAttribute {
     pub counterparty_port_id: PortId,
 }
@@ -54,7 +91,19 @@ impl From<CounterpartyPortIdAttribute> for abci::EventAttribute {
     }
 }
 
-#[derive(Debug, From)]
+#[cfg_attr(
+    feature = "parity-scale-codec",
+    derive(
+        parity_scale_codec::Encode,
+        parity_scale_codec::Decode,
+        scale_info::TypeInfo
+    )
+)]
+#[cfg_attr(
+    feature = "borsh",
+    derive(borsh::BorshSerialize, borsh::BorshDeserialize)
+)]
+#[derive(Debug, From, Serialize, Deserialize, PartialEq, Eq)]
 pub struct CounterpartyChannelIdAttribute {
     pub counterparty_channel_id: ChannelId,
 }
@@ -75,7 +124,19 @@ impl AsRef<ChannelId> for CounterpartyChannelIdAttribute {
     }
 }
 
-#[derive(Debug, From)]
+#[cfg_attr(
+    feature = "parity-scale-codec",
+    derive(
+        parity_scale_codec::Encode,
+        parity_scale_codec::Decode,
+        scale_info::TypeInfo
+    )
+)]
+#[cfg_attr(
+    feature = "borsh",
+    derive(borsh::BorshSerialize, borsh::BorshDeserialize)
+)]
+#[derive(Debug, From, Serialize, Deserialize, PartialEq, Eq)]
 pub struct ConnectionIdAttribute {
     pub connection_id: ConnectionId,
 }
@@ -86,7 +147,19 @@ impl From<ConnectionIdAttribute> for abci::EventAttribute {
     }
 }
 
-#[derive(Debug, From)]
+#[cfg_attr(
+    feature = "parity-scale-codec",
+    derive(
+        parity_scale_codec::Encode,
+        parity_scale_codec::Decode,
+        scale_info::TypeInfo
+    )
+)]
+#[cfg_attr(
+    feature = "borsh",
+    derive(borsh::BorshSerialize, borsh::BorshDeserialize)
+)]
+#[derive(Debug, From, Serialize, Deserialize, PartialEq, Eq)]
 pub struct VersionAttribute {
     pub version: Version,
 }
