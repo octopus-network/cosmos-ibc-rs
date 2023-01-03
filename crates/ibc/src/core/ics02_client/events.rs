@@ -123,23 +123,101 @@ impl From<ConsensusHeightsAttribute> for abci::EventAttribute {
     }
 }
 
-#[cfg_attr(
-    feature = "parity-scale-codec",
-    derive(
-        parity_scale_codec::Encode,
-        parity_scale_codec::Decode,
-        scale_info::TypeInfo
-    )
-)]
-#[cfg_attr(
-    feature = "borsh",
-    derive(borsh::BorshSerialize, borsh::BorshDeserialize)
-)]
 #[derive(Debug, From, Serialize, Deserialize)]
 struct HeaderAttribute {
     header: Any,
 }
 
+mod sealed {
+    use super::*;
+
+    #[cfg_attr(
+        feature = "parity-scale-codec",
+        derive(
+            parity_scale_codec::Encode,
+            parity_scale_codec::Decode,
+            scale_info::TypeInfo
+        )
+    )]
+    #[cfg_attr(
+        feature = "borsh",
+        derive(borsh::BorshSerialize, borsh::BorshDeserialize)
+    )]
+    pub struct InnerAny {
+        pub type_url: String,
+        pub value: Vec<u8>,
+    }
+
+    #[cfg(feature = "borsh")]
+    impl borsh::BorshSerialize for HeaderAttribute {
+        fn serialize<W: borsh::maybestd::io::Write>(
+            &self,
+            writer: &mut W,
+        ) -> borsh::maybestd::io::Result<()> {
+            let inner_any = InnerAny {
+                type_url: self.header.type_url.clone(),
+                value: self.header.value.clone(),
+            };
+
+            borsh::BorshSerialize::serialize(&inner_any, writer)
+        }
+    }
+
+    #[cfg(feature = "borsh")]
+    impl borsh::BorshDeserialize for HeaderAttribute {
+        fn deserialize(buf: &mut &[u8]) -> borsh::maybestd::io::Result<Self> {
+            let inner_any = InnerAny::deserialize(buf)?;
+
+            Ok(HeaderAttribute {
+                header: Any {
+                    type_url: inner_any.type_url,
+                    value: inner_any.value,
+                },
+            })
+        }
+    }
+
+    #[cfg(feature = "parity-scale-codec")]
+    impl parity_scale_codec::Encode for HeaderAttribute {
+        fn encode_to<T: parity_scale_codec::Output + ?Sized>(&self, writer: &mut T) {
+            let inner_any = InnerAny {
+                type_url: self.header.type_url.clone(),
+                value: self.header.value.clone(),
+            };
+            inner_any.encode_to(writer);
+        }
+    }
+    #[cfg(feature = "parity-scale-codec")]
+    impl parity_scale_codec::Decode for HeaderAttribute {
+        fn decode<I: parity_scale_codec::Input>(
+            input: &mut I,
+        ) -> Result<Self, parity_scale_codec::Error> {
+            let inner_any = InnerAny::decode(input)?;
+            let header = Any {
+                type_url: inner_any.type_url.clone(),
+                value: inner_any.value.clone(),
+            };
+
+            Ok(HeaderAttribute { header })
+        }
+    }
+
+    #[cfg(feature = "parity-scale-codec")]
+    impl scale_info::TypeInfo for HeaderAttribute {
+        type Identity = Self;
+
+        fn type_info() -> scale_info::Type {
+            scale_info::Type::builder()
+                .path(scale_info::Path::new("HeaderAttribute", module_path!()))
+                // i128 is chosen before we represent the timestamp is nanoseconds, which is represented as a i128 by Time
+                .composite(
+                    scale_info::build::Fields::named()
+                        .field(|f| f.ty::<String>().name("type_url").type_name("String"))
+                        .field(|f| f.ty::<Vec<u8>>().name("value").type_name("Vec<u8>")),
+                )
+        }
+    }
+}
 impl From<HeaderAttribute> for abci::EventAttribute {
     fn from(attr: HeaderAttribute) -> Self {
         (
