@@ -426,8 +426,9 @@ impl Ics2ClientState for ClientState {
         // Check if a consensus state is already installed; if so it should
         // match the untrusted header.
         let header_consensus_state = TmConsensusState::from(header.clone());
+        let height = ctx.client_state(&client_id)?.latest_height();
         let existing_consensus_state =
-            match maybe_consensus_state(ctx, &client_id, &header.height())? {
+            match maybe_consensus_state(ctx, &client_id, &height)? {
                 Some(cs) => {
                     let cs = downcast_tm_consensus_state(cs.as_ref())?;
                     // If this consensus state matches, skip verification
