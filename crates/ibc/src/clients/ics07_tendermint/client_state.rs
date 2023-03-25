@@ -400,22 +400,15 @@ impl Ics2ClientState for ClientState {
         ) -> Result<Option<Box<dyn ConsensusState>>, ClientError> {
             match ctx.consensus_state(client_id, height) {
                 Ok(cs) => Ok(Some(cs)),
-                Err(e) => {
-                    tracing::info!("🙅🙅🙅🙅check_header_and_update_state: maybe_consensus_state client error: {:?}", e);
-                    match e {
-                        ClientError::ConsensusStateNotFound {
-                            client_id: _,
-                            height: _,
-                        } => {
-                            tracing::info!("🙅🙅🙅🙅check_header_and_update_state: maybe_consensus_state client error: ClientError::ConsensusStateNotFound");
-                            Ok(None)
-                        }
-                        e => {
-                            tracing::info!("🙅🙅🙅🙅check_header_and_update_state: maybe_consensus_state client error: Other: {:?}", e);
-                            Err(e)
-                        }
-                    }
-                }
+                Err(e) => match e {
+                    ClientError::ConsensusStateNotFound {
+                        client_id: _,
+                        height: _,
+                    } => Ok(None),
+                    v => Err(ClientError::Other {
+                        description: v.to_string(),
+                    }),
+                },
             }
         }
 
