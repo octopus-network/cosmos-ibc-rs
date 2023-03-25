@@ -407,10 +407,10 @@ impl Ics2ClientState for ClientState {
                             client_id: _,
                             height: _,
                         } => {
-                            tracing::info!("🙅🙅🙅🙅check_header_and_update_state: maybe_consensus_state client error: ClientError::COnsensusStateNotFound");
+                            tracing::info!("🙅🙅🙅🙅check_header_and_update_state: maybe_consensus_state client error: ClientError::ConsensusStateNotFound");
                             Ok(None)
                         }
-                        _ => {
+                        e => {
                             tracing::info!("🙅🙅🙅🙅check_header_and_update_state: maybe_consensus_state client error: Other: {:?}", e);
                             Err(e)
                         }
