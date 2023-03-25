@@ -400,13 +400,16 @@ impl Ics2ClientState for ClientState {
         ) -> Result<Option<Box<dyn ConsensusState>>, ClientError> {
             match ctx.consensus_state(client_id, height) {
                 Ok(cs) => Ok(Some(cs)),
-                Err(e) => match e {
-                    ClientError::ConsensusStateNotFound {
-                        client_id: _,
-                        height: _,
-                    } => Ok(None),
-                    _ => Err(e),
-                },
+                Err(e) => {
+                    tracing::info!("🙅🙅🙅🙅check_header_and_update_state: maybe_consensus_state client error: {:?}", e);
+                    match e {
+                        ClientError::ConsensusStateNotFound {
+                            client_id: _,
+                            height: _,
+                        } => Ok(None),
+                        _ => Err(e),
+                    }
+                }
             }
         }
 
@@ -427,24 +430,23 @@ impl Ics2ClientState for ClientState {
         // match the untrusted header.
         let header_consensus_state = TmConsensusState::from(header.clone());
         let height = ctx.client_state(&client_id)?.latest_height();
-        let existing_consensus_state =
-            match maybe_consensus_state(ctx, &client_id, &height)? {
-                Some(cs) => {
-                    let cs = downcast_tm_consensus_state(cs.as_ref())?;
-                    // If this consensus state matches, skip verification
-                    // (optimization)
-                    if cs == header_consensus_state {
-                        // Header is already installed and matches the incoming
-                        // header (already verified)
-                        return Ok(UpdatedState {
-                            client_state: client_state.into_box(),
-                            consensus_state: cs.into_box(),
-                        });
-                    }
-                    Some(cs)
+        let existing_consensus_state = match maybe_consensus_state(ctx, &client_id, &height)? {
+            Some(cs) => {
+                let cs = downcast_tm_consensus_state(cs.as_ref())?;
+                // If this consensus state matches, skip verification
+                // (optimization)
+                if cs == header_consensus_state {
+                    // Header is already installed and matches the incoming
+                    // header (already verified)
+                    return Ok(UpdatedState {
+                        client_state: client_state.into_box(),
+                        consensus_state: cs.into_box(),
+                    });
                 }
-                None => None,
-            };
+                Some(cs)
+            }
+            None => None,
+        };
 
         let trusted_consensus_state = downcast_tm_consensus_state(
             ctx.consensus_state(&client_id, &header.trusted_height)?
