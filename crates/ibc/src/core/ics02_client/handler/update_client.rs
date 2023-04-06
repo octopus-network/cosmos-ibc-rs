@@ -61,7 +61,7 @@ where
             height: client_state.latest_height(),
         })?;
 
-    debug!("latest consensus state: {:?}", latest_consensus_state);
+    debug!("1 latest consensus state: {:?}", latest_consensus_state);
 
     let now = ctx.host_timestamp()?;
     let duration = now
@@ -79,11 +79,13 @@ where
         .into());
     }
 
+    debug!("1 new_check_header_and_update_state");
     let _ = client_state
         .new_check_header_and_update_state(ctx, client_id.clone(), header)
         .map_err(|e| ClientError::HeaderVerificationFailure {
             reason: e.to_string(),
         })?;
+    debug!("1 new_check_header_and_update_state end");
 
     Ok(())
 }
@@ -103,6 +105,7 @@ where
     // Read client state from the host chain store.
     let client_state = ctx.client_state(&client_id)?;
 
+    debug!("2 new_check_header_and_update_state");
     let UpdatedState {
         client_state,
         consensus_state,
@@ -111,6 +114,7 @@ where
         .map_err(|e| ClientError::HeaderVerificationFailure {
             reason: e.to_string(),
         })?;
+    debug!("2 new_check_header_and_update_state end");
 
     ctx.store_client_state(ClientStatePath(client_id.clone()), client_state.clone())?;
     ctx.store_consensus_state(
@@ -172,7 +176,7 @@ pub(crate) fn process<Ctx: ClientReader>(
             },
         )?;
 
-    debug!("latest consensus state: {:?}", latest_consensus_state);
+    debug!("2latest consensus state: {:?}", latest_consensus_state);
 
     let now = ClientReader::host_timestamp(ctx)?;
     let duration = now
@@ -189,6 +193,7 @@ pub(crate) fn process<Ctx: ClientReader>(
         });
     }
 
+    debug!("3 check_header_and_update_state");
     // Use client_state to validate the new header against the latest consensus_state.
     // This function will return the new client_state (its latest_height changed) and a
     // consensus_state obtained from header. These will be later persisted by the keeper.
@@ -200,6 +205,7 @@ pub(crate) fn process<Ctx: ClientReader>(
         .map_err(|e| ClientError::HeaderVerificationFailure {
             reason: e.to_string(),
         })?;
+    debug!("3 check_header_and_update_state end");
 
     let client_type = client_state.client_type();
     let consensus_height = client_state.latest_height();
