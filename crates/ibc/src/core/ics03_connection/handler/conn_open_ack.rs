@@ -1,5 +1,6 @@
 //! Protocol logic specific to processing ICS3 messages of type `MsgConnectionOpenAck`.
 use crate::prelude::*;
+use tracing::debug;
 
 use crate::core::ics03_connection::connection::{ConnectionEnd, Counterparty, State};
 use crate::core::ics03_connection::context::ConnectionReader;
@@ -91,6 +92,7 @@ where
                 vars.conn_end_on_a.delay_period(),
             );
 
+            debug!("dd");
             client_state_of_b_on_a
                 .verify_connection_state(
                     msg.proofs_height_on_b,
@@ -262,6 +264,7 @@ pub(crate) fn process(
                 conn_end_on_a.delay_period(),
             );
 
+            debug!("cc");
             client_state_of_b_on_a
                 .verify_connection_state(
                     msg.proofs_height_on_b,

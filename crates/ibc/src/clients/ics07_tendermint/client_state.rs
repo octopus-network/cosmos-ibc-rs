@@ -1061,13 +1061,25 @@ impl Ics2ClientState for ClientState {
         connection_id: &ConnectionId,
         expected_connection_end: &ConnectionEnd,
     ) -> Result<(), ClientError> {
+        debug!(
+            "
+        height:{:?},
+        prefix: {:?},
+        proof: {:?},
+        root: {:?},
+        connection_id: {:?},
+        expected_connection_end: {:?}",
+            height, prefix, proof, root, connection_id, expected_connection_end,
+        );
         let client_state = downcast_tm_client_state(self)?;
         client_state.verify_height(height)?;
 
         let path = ConnectionsPath(connection_id.clone());
+        debug!("path: {:?}", path);
         let value = expected_connection_end
             .encode_vec()
             .map_err(ClientError::InvalidConnectionEnd)?;
+        debug!("value: {:?}", value);
         verify_membership(client_state, prefix, proof, root, path, value)
     }
 
