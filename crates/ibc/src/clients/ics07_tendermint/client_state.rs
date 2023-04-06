@@ -1,4 +1,5 @@
 use crate::prelude::*;
+use tracing::debug;
 
 use core::convert::{TryFrom, TryInto};
 use core::time::Duration;
@@ -426,6 +427,7 @@ impl Ics2ClientState for ClientState {
         // Check if a consensus state is already installed; if so it should
         // match the untrusted header.
         let header_consensus_state = TmConsensusState::from(header.clone());
+        debug!("existing_consensus_state");
         let existing_consensus_state =
             match maybe_consensus_state(ctx, &client_id, &header.height())? {
                 Some(cs) => {
@@ -445,10 +447,15 @@ impl Ics2ClientState for ClientState {
                 None => None,
             };
 
+        debug!(
+            "existing_consensus_state: {:?}, header: {:?}",
+            existing_consensus_state, header
+        );
         let trusted_consensus_state = downcast_tm_consensus_state(
             ctx.consensus_state(&client_id, &header.trusted_height)?
                 .as_ref(),
         )?;
+        debug!("trusted_consensus_state: {:?}", existing_consensus_state);
 
         let trusted_state = TrustedBlockState {
             chain_id: &self.chain_id.clone().into(),
@@ -501,12 +508,17 @@ impl Ics2ClientState for ClientState {
 
         // Monotonicity checks for timestamps for in-the-middle updates
         // (cs-new, cs-next, cs-latest)
+        debug!(
+            "client_state: latest height:{:?}",
+            client_state.latest_height()
+        );
         if header.height() < client_state.latest_height() {
             let maybe_next_cs = ctx
                 .next_consensus_state(&client_id, &header.height())?
                 .as_ref()
                 .map(|cs| downcast_tm_consensus_state(cs.as_ref()))
                 .transpose()?;
+            debug!("maybe_next_cs:{:?}", maybe_next_cs);
 
             if let Some(next_cs) = maybe_next_cs {
                 // New (untrusted) header timestamp cannot occur after next
@@ -530,6 +542,7 @@ impl Ics2ClientState for ClientState {
                 .as_ref()
                 .map(|cs| downcast_tm_consensus_state(cs.as_ref()))
                 .transpose()?;
+            debug!("maybe_prev_cs:{:?}", maybe_prev_cs);
 
             if let Some(prev_cs) = maybe_prev_cs {
                 // New (untrusted) header timestamp cannot occur before the
