@@ -509,10 +509,13 @@ impl Ics2ClientState for ClientState {
         // Monotonicity checks for timestamps for in-the-middle updates
         // (cs-new, cs-next, cs-latest)
         debug!(
-            "client_state: latest height:{:?}",
+            "client_state.latest_height():{:?}",
             client_state.latest_height()
         );
+        debug!("header.height() :{:?}", header.height());
+        debug!("header.trusted_height :{:?}", header.trusted_height);
         if header.height() < client_state.latest_height() {
+            debug!("aaaa");
             let maybe_next_cs = ctx
                 .next_consensus_state(&client_id, &header.height())?
                 .as_ref()
@@ -537,6 +540,7 @@ impl Ics2ClientState for ClientState {
 
         // (cs-trusted, cs-prev, cs-new)
         if header.trusted_height < header.height() {
+            debug!("bbbb");
             let maybe_prev_cs = ctx
                 .prev_consensus_state(&client_id, &header.height())?
                 .as_ref()
