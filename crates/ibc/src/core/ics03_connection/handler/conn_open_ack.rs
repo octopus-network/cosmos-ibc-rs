@@ -288,22 +288,25 @@ pub(crate) fn process(
                 client_error: e,
             })?;
 
-        let expected_consensus_state_of_a_on_b =
-            ctx_a.host_consensus_state(&msg.consensus_height_of_a_on_b)?;
-        client_state_of_b_on_a
-            .verify_client_consensus_state(
-                msg.proofs_height_on_b,
-                prefix_on_b,
-                &msg.proof_consensus_state_of_a_on_b,
-                consensus_state_of_b_on_a.root(),
-                conn_end_on_a.counterparty().client_id(),
-                msg.consensus_height_of_a_on_b,
-                expected_consensus_state_of_a_on_b.as_ref(),
-            )
-            .map_err(|e| ConnectionError::ConsensusStateVerificationFailure {
-                height: msg.proofs_height_on_b,
-                client_error: e,
-            })?;
+        // As we cannot get the host consensus state in smart contract,
+        // the verification of consensus state needs to be skipped for now.
+        //
+        // let expected_consensus_state_of_a_on_b =
+        //     ctx_a.host_consensus_state(&msg.consensus_height_of_a_on_b)?;
+        // client_state_of_b_on_a
+        //     .verify_client_consensus_state(
+        //         msg.proofs_height_on_b,
+        //         prefix_on_b,
+        //         &msg.proof_consensus_state_of_a_on_b,
+        //         consensus_state_of_b_on_a.root(),
+        //         conn_end_on_a.counterparty().client_id(),
+        //         msg.consensus_height_of_a_on_b,
+        //         expected_consensus_state_of_a_on_b.as_ref(),
+        //     )
+        //     .map_err(|e| ConnectionError::ConsensusStateVerificationFailure {
+        //         height: msg.proofs_height_on_b,
+        //         client_error: e,
+        //     })?;
     }
 
     // Success
