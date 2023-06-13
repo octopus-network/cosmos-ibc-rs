@@ -255,7 +255,6 @@ impl ClientState {
                 earliest_height,
             });
         }
-        log::info!("🐙🐙 pallet_ibc::ics07_tendermint -> verify_delay_passe !");
         Ok(())
     }
 
@@ -1383,13 +1382,6 @@ fn verify_membership(
     let merkle_proof: MerkleProof = RawMerkleProof::try_from(proof.clone())
         .map_err(ClientError::InvalidCommitmentProof)?
         .into();
-
-    log::info!(
-        "🐙🐙 pallet_ibc::ics07_tendermint -> verify_membership merkle_path: {:?}, merkle_proof: {:?}",
-        merkle_path,
-        merkle_proof
-    );
-
     merkle_proof
         .verify_membership(
             &client_state.proof_specs,
@@ -1433,10 +1425,6 @@ fn verify_delay_passed(
     let current_height = ctx.host_height().map_err(|e| ClientError::Other {
         description: e.to_string(),
     })?;
-
-    log::info!("🐙🐙 pallet_ibc::ics07_tendermint -> verify_delay_passed current_timestamp: {:?}, current_height: {:?}",
-     current_timestamp,current_height);
-
     let client_id = connection_end.client_id();
     let processed_time =
         ctx.client_update_time(client_id, &height)
@@ -1453,9 +1441,6 @@ fn verify_delay_passed(
 
     let delay_period_time = connection_end.delay_period();
     let delay_period_height = ctx.block_delay(&delay_period_time);
-
-    log::info!("🐙🐙 pallet_ibc::ics07_tendermint -> verify_delay_passed delay_period_time: {:?}, delay_period_height: {:?}",
-    delay_period_time,delay_period_height);
 
     ClientState::verify_delay_passed(
         current_timestamp,

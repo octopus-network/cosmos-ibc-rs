@@ -58,7 +58,6 @@ mocks-no-std = ["cfg-if"]
 # Proto definitions for all IBC-related interfaces, e.g., connections or channels.
 ibc-proto = { version = "0.25.0", default-features = false, features = ["parity-scale-codec", "borsh"], git = "https://github.com/octopus-network/ibc-proto-rs", branch = "ibc" }
 ics23 = { version = "0.9.0", default-features = false, features = ["host-functions"] }
-# ics23 = { version = "0.9.0", default-features = false, features = ["host-functions"],path = "../../../ics23/rust" }
 time = { version = ">=0.3.0, <0.3.18", default-features = false }
 serde_derive = { version = "1.0.104", default-features = false, optional = true }
 serde = { version = "1.0", default-features = false, optional = true }

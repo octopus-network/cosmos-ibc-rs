@@ -110,7 +110,6 @@ impl MerkleProof {
                     subroot =
                         calculate_existence_root::<ics23::HostFunctionsManager>(existence_proof)
                             .map_err(|_| CommitmentError::InvalidMerkleProof)?;
-                    log::info!("🐙🐙 pallet_ibc::ics23_commitment::merkle -> verify_membership subroot: {:?}",subroot);
                     if !verify_membership::<ics23::HostFunctionsManager>(
                         proof,
                         spec,
@@ -125,13 +124,7 @@ impl MerkleProof {
                 _ => return Err(CommitmentError::InvalidMerkleProof),
             }
         }
-
-        log::info!(
-            "🐙🐙 pallet_ibc::ics23_commitment::merkle -> verify_membership subroot: {:?}, root.hash: {:?}",
-            subroot,
-            root.hash
-        );
-
+        
         if root.hash != subroot {
             return Err(CommitmentError::VerificationFailure);
         }

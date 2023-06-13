@@ -57,11 +57,6 @@ impl parity_scale_codec::Encode for Timestamp {
             assert!(s >= 0, "time {time:?} has negative `.timestamp()`");
             Some(s.try_into().unwrap())
         });
-
-        // log::info!(
-        //     "🐙🐙 pallet_ics20::timestamp -> encode_to timestamp: {:?} ",
-        //     timestamp
-        // );
         timestamp.encode_to(writer);
     }
 }
@@ -71,18 +66,9 @@ impl parity_scale_codec::Decode for Timestamp {
         input: &mut I,
     ) -> Result<Self, parity_scale_codec::Error> {
         let decoded_timestamp = Option::<u64>::decode(input)?;
-        // log::info!(
-        //     "🐙🐙 pallet_ics20::timestamp ->Option::<u64>::decode(input): {:?} ",
-        //     decoded_timestamp
-        // );
         let timstamp = if let Some(v) = decoded_timestamp {
-            Timestamp::from_nanoseconds(v).map_err(|e| {
-                log::error!(
-                    "🐙🐙 pallet_ics20::timestamp -> decode timestamp error : {:?} ",
-                    e
-                );
-                parity_scale_codec::Error::from("from nanoseconds error")
-            })
+            Timestamp::from_nanoseconds(v)
+                .map_err(|e| parity_scale_codec::Error::from("from nanoseconds error"))
         } else {
             Ok(Timestamp::none())
         };
