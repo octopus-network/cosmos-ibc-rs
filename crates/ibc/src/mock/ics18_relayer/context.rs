@@ -90,7 +90,7 @@ mod tests {
         // Client on destination chain can be updated.
         Ok(ClientMsg::UpdateClient(MsgUpdateClient {
             client_id: client_id.clone(),
-            header: src_header.clone_into(),
+            client_message: src_header.clone_into(),
             signer: dest.signer(),
         }))
     }
@@ -145,7 +145,7 @@ mod tests {
 
             assert!(
                 client_msg_b_res.is_ok(),
-                "create_client_update failed for context destination {ctx_b:?}, error: {client_msg_b_res:?}",                
+                "create_client_update failed for context destination {ctx_b:?}, error: {client_msg_b_res:?}",
             );
 
             let client_msg_b = client_msg_b_res.unwrap();

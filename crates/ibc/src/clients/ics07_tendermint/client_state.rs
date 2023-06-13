@@ -778,9 +778,9 @@ mod tests {
     use core::time::Duration;
     use test_log::test;
 
+    use ibc_proto::cosmos::ics23::v1::ProofSpec as Ics23ProofSpec;
     use ibc_proto::google::protobuf::Any;
     use ibc_proto::ibc::core::client::v1::Height as RawHeight;
-    use ibc_proto::ics23::ProofSpec as Ics23ProofSpec;
 
     use crate::clients::ics07_tendermint::client_state::{
         AllowUpdate, ClientState as TmClientState,

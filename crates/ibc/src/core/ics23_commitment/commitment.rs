@@ -190,8 +190,8 @@ impl serde::Serialize for CommitmentPrefix {
 #[cfg(test)]
 pub mod test_util {
     use crate::prelude::*;
+    use ibc_proto::cosmos::ics23::v1::CommitmentProof;
     use ibc_proto::ibc::core::commitment::v1::MerkleProof as RawMerkleProof;
-    use ibc_proto::ics23::CommitmentProof;
 
     /// Returns a dummy `RawMerkleProof`, for testing only!
     pub fn get_dummy_merkle_proof() -> RawMerkleProof {

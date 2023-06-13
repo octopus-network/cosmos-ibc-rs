@@ -141,7 +141,7 @@ mod tests {
         let height = Height::new(0, 46).unwrap();
         let msg = MsgUpdateClient {
             client_id,
-            header: MockHeader::new(height).with_timestamp(timestamp).into(),
+            client_message: MockHeader::new(height).with_timestamp(timestamp).into(),
             signer,
         };
 
@@ -167,7 +167,7 @@ mod tests {
 
         let msg = MsgUpdateClient {
             client_id: ClientId::from_str("nonexistingclient").unwrap(),
-            header: MockHeader::new(Height::new(0, 46).unwrap()).into(),
+            client_message: MockHeader::new(Height::new(0, 46).unwrap()).into(),
             signer,
         };
 
@@ -207,7 +207,7 @@ mod tests {
         let latest_header_height = block.height();
         let msg = MsgUpdateClient {
             client_id,
-            header: block.into(),
+            client_message: block.into(),
             signer,
         };
 
@@ -254,7 +254,7 @@ mod tests {
         let latest_header_height = block.height();
         let msg = MsgUpdateClient {
             client_id,
-            header: block.into(),
+            client_message: block.into(),
             signer,
         };
 
@@ -370,7 +370,7 @@ mod tests {
         let latest_header_height = block.height();
         let msg = MsgUpdateClient {
             client_id,
-            header: block.into(),
+            client_message: block.into(),
             signer,
         };
 
@@ -424,7 +424,7 @@ mod tests {
 
         let msg = MsgUpdateClient {
             client_id,
-            header: block_ref.clone().into(),
+            client_message: block_ref.clone().into(),
             signer,
         };
 
@@ -444,7 +444,7 @@ mod tests {
         let header: Any = MockHeader::new(height).with_timestamp(timestamp).into();
         let msg = MsgUpdateClient {
             client_id: client_id.clone(),
-            header: header.clone(),
+            client_message: header.clone(),
             signer,
         };
 
