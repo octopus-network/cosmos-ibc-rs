@@ -147,6 +147,7 @@ pub(crate) fn process<Ctx: ClientReader>(
     ctx: &Ctx,
     msg: MsgUpdateClient,
 ) -> HandlerResult<ClientResult, ClientError> {
+    log::info!("🐙🐙 allet_ibc::update client -> process MsgUpdateClient: {:?}", msg);
     let mut output = HandlerOutput::builder();
 
     let MsgUpdateClient {
@@ -172,15 +173,22 @@ pub(crate) fn process<Ctx: ClientReader>(
             },
         )?;
 
-    debug!("latest consensus state: {:?}", latest_consensus_state);
+    log::info!(
+        "🐙🐙 pallet_ibc::update client -> process latest_consensus_state: {:?}",
+        latest_consensus_state
+    );
 
-    let now = ClientReader::host_timestamp(ctx)?;
+    let now: Timestamp = ClientReader::host_timestamp(ctx)?;
+    debug!("🐙🐙 allet_ibc::update client -> process host_timestamp: {:?}", now,);
+
     let duration = now
         .duration_since(&latest_consensus_state.timestamp())
         .ok_or_else(|| ClientError::InvalidConsensusStateTimestamp {
             time1: latest_consensus_state.timestamp(),
             time2: now,
         })?;
+
+    log::info!("🐙🐙 allet_ibc::update client -> process the duration from latest_consensus_state.timestamp to now: {:?}", duration,);
 
     if client_state.expired(duration) {
         return Err(ClientError::HeaderNotWithinTrustPeriod {

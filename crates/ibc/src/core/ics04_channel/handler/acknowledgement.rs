@@ -147,6 +147,7 @@ pub(crate) fn process<Ctx: ChannelReader>(
     ctx_a: &Ctx,
     msg: &MsgAcknowledgement,
 ) -> HandlerResult<PacketResult, PacketError> {
+    log::info!("🐙🐙 pallet_ics20 ->ack_packet message : {:?} ", msg);
     let mut output = HandlerOutput::builder();
 
     let packet = &msg.packet;
@@ -269,7 +270,7 @@ pub(crate) fn process<Ctx: ChannelReader>(
         chan_end_on_a.ordering,
         conn_id_on_a.clone(),
     )));
-
+    log::info!("🐙🐙 pallet_ics20 ->ack_packet output:{:?}", output);
     Ok(output.with_result(result))
 }
 

@@ -54,6 +54,7 @@ where
         denom: denom.clone(),
         amount: token.amount,
     };
+    log::info!("🐙🐙 pallet_ics20 -> send_transfer coin : {} ", coin);
 
     let sender = msg
         .sender
@@ -87,6 +88,7 @@ where
         timeout_height_on_b: msg.timeout_height_on_b,
         timeout_timestamp_on_b: msg.timeout_timestamp_on_b,
     };
+    log::info!("🐙🐙 pallet_ics20 ->send_transfer packet : {:?} ", packet);
 
     let HandlerOutput {
         result,

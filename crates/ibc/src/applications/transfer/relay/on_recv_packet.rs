@@ -13,6 +13,10 @@ pub fn process_recv_packet<Ctx: 'static + TokenTransferContext>(
     packet: &Packet,
     data: PacketData,
 ) -> Result<(), TokenTransferError> {
+    log::info!(
+        "🐙🐙 pallet_ics20_transfer::relay -> process_recv_packet, packet:{:?} , PacketData : {:?} ",
+        packet,data);
+
     if !ctx.is_receive_enabled() {
         return Err(TokenTransferError::ReceiveDisabled);
     }
@@ -35,24 +39,38 @@ pub fn process_recv_packet<Ctx: 'static + TokenTransferContext>(
             c.denom.remove_trace_prefix(&prefix);
             c
         };
+        // log::info!(
+        // 	"🐙🐙 pallet_ics20_transfer::relay -> process_recv_packet, TracePrefix:{:?} , coin : {:?} ",
+        // 	prefix,coin);
 
         let escrow_address =
             ctx.get_channel_escrow_address(&packet.port_on_b, &packet.chan_on_b)?;
 
         ctx.send_coins(&escrow_address, &receiver_account, &coin)?;
     } else {
+        // log::info!(
+        //     "🐙🐙 pallet_ics20_transfer::relay -> sender chain is the source, mint vouchers "
+        // );
         // sender chain is the source, mint vouchers
         let prefix = TracePrefix::new(packet.port_on_b.clone(), packet.chan_on_b.clone());
         let coin = {
             let mut c = data.token;
-            c.denom.add_trace_prefix(prefix);
+            c.denom.add_trace_prefix(prefix.clone());
             c
         };
+        // log::info!(
+        // 	"🐙🐙 pallet_ics20_transfer::relay -> process_recv_packet, TracePrefix:{:?} , coin : {:?} ",
+        // 	prefix,coin);
 
         let denom_trace_event = DenomTraceEvent {
             trace_hash: ctx.denom_hash_string(&coin.denom),
             denom: coin.denom.clone(),
         };
+        log::info!(
+            "🐙🐙 pallet_ics20_transfer::relay -> process_recv_packet, trace_hash: {:?},denom: {:?} ",
+            denom_trace_event.trace_hash,denom_trace_event.denom
+        );
+
         output.emit(denom_trace_event.into());
 
         ctx.mint_coins(&receiver_account, &coin)?;

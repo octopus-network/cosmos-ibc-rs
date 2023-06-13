@@ -214,6 +214,8 @@ pub(crate) fn process(
     ctx_b: &dyn ConnectionReader,
     msg: MsgConnectionOpenTry,
 ) -> HandlerResult<ConnectionResult, ConnectionError> {
+    log::info!("🐙🐙 pallet_ibc::conn_open_try -> process msg: {:?}", msg);
+
     let mut output = HandlerOutput::builder();
 
     let conn_id_on_b = ConnectionId::new(ctx_b.connection_counter()?);
@@ -275,6 +277,8 @@ pub(crate) fn process(
                 .map_err(ConnectionError::VerifyConnectionState)?;
         }
 
+        // log::info!("🐙🐙 pallet_ibc::conn_open_try -> verify_connection_state passed !");
+
         client_state_of_a_on_b
             .verify_client_full_state(
                 msg.proofs_height_on_a,
@@ -289,22 +293,25 @@ pub(crate) fn process(
                 client_error: e,
             })?;
 
-        let expected_consensus_state_of_b_on_a =
-            ctx_b.host_consensus_state(&msg.consensus_height_of_b_on_a)?;
-        client_state_of_a_on_b
-            .verify_client_consensus_state(
-                msg.proofs_height_on_a,
-                prefix_on_a,
-                &msg.proof_consensus_state_of_b_on_a,
-                consensus_state_of_a_on_b.root(),
-                client_id_on_a,
-                msg.consensus_height_of_b_on_a,
-                expected_consensus_state_of_b_on_a.as_ref(),
-            )
-            .map_err(|e| ConnectionError::ConsensusStateVerificationFailure {
-                height: msg.proofs_height_on_a,
-                client_error: e,
-            })?;
+        // log::info!("🐙🐙 pallet_ibc::conn_open_try -> verify_client_full_state passed !");
+
+        // TODO: impl host_consensus_state on substrate-ibc
+        // let expected_consensus_state_of_b_on_a =
+        //     ctx_b.host_consensus_state(&msg.consensus_height_of_b_on_a)?;
+        // client_state_of_a_on_b
+        //     .verify_client_consensus_state(
+        //         msg.proofs_height_on_a,
+        //         prefix_on_a,
+        //         &msg.proof_consensus_state_of_b_on_a,
+        //         consensus_state_of_a_on_b.root(),
+        //         client_id_on_a,
+        //         msg.consensus_height_of_b_on_a,
+        //         expected_consensus_state_of_b_on_a.as_ref(),
+        //     )
+        //     .map_err(|e| ConnectionError::ConsensusStateVerificationFailure {
+        //         height: msg.proofs_height_on_a,
+        //         client_error: e,
+        //     })?;
     }
 
     // Success

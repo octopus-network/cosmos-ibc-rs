@@ -51,7 +51,17 @@ impl borsh::BorshDeserialize for Timestamp {
 #[cfg(feature = "parity-scale-codec")]
 impl parity_scale_codec::Encode for Timestamp {
     fn encode_to<T: parity_scale_codec::Output + ?Sized>(&self, writer: &mut T) {
-        let timestamp = self.nanoseconds();
+        let timestamp: Option<u64> = self.time.map_or(None, |time| {
+            let t: OffsetDateTime = time.into();
+            let s = t.unix_timestamp_nanos();
+            assert!(s >= 0, "time {time:?} has negative `.timestamp()`");
+            Some(s.try_into().unwrap())
+        });
+
+        // log::info!(
+        //     "🐙🐙 pallet_ics20::timestamp -> encode_to timestamp: {:?} ",
+        //     timestamp
+        // );
         timestamp.encode_to(writer);
     }
 }
@@ -60,9 +70,23 @@ impl parity_scale_codec::Decode for Timestamp {
     fn decode<I: parity_scale_codec::Input>(
         input: &mut I,
     ) -> Result<Self, parity_scale_codec::Error> {
-        let timestamp = u64::decode(input)?;
-        Timestamp::from_nanoseconds(timestamp)
-            .map_err(|_| parity_scale_codec::Error::from("from nanoseconds error"))
+        let decoded_timestamp = Option::<u64>::decode(input)?;
+        // log::info!(
+        //     "🐙🐙 pallet_ics20::timestamp ->Option::<u64>::decode(input): {:?} ",
+        //     decoded_timestamp
+        // );
+        let timstamp = if let Some(v) = decoded_timestamp {
+            Timestamp::from_nanoseconds(v).map_err(|e| {
+                log::error!(
+                    "🐙🐙 pallet_ics20::timestamp -> decode timestamp error : {:?} ",
+                    e
+                );
+                parity_scale_codec::Error::from("from nanoseconds error")
+            })
+        } else {
+            Ok(Timestamp::none())
+        };
+        timstamp
     }
 }
 
@@ -74,11 +98,10 @@ impl scale_info::TypeInfo for Timestamp {
         scale_info::Type::builder()
             .path(scale_info::Path::new("Timestamp", module_path!()))
             // i128 is chosen before we represent the timestamp is nanoseconds, which is represented as a i128 by Time
-            .composite(scale_info::build::Fields::named().field(|f| {
-                f.ty::<Option<i128>>()
-                    .name("time")
-                    .type_name("Option<i128>")
-            }))
+            .composite(
+                scale_info::build::Fields::named()
+                    .field(|f| f.ty::<Option<u64>>().name("time").type_name("Option<u64>")),
+            )
     }
 }
 

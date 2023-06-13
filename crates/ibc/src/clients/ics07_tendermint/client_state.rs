@@ -1,3 +1,4 @@
+#![allow(unused_imports, unused_mut, dead_code, unused_variables)]
 use crate::prelude::*;
 
 use core::convert::{TryFrom, TryInto};
@@ -254,7 +255,7 @@ impl ClientState {
                 earliest_height,
             });
         }
-
+        log::info!("🐙🐙 pallet_ibc::ics07_tendermint -> verify_delay_passe !");
         Ok(())
     }
 
@@ -1021,6 +1022,11 @@ impl Ics2ClientState for ClientState {
         expected_consensus_state: &dyn ConsensusState,
     ) -> Result<(), ClientError> {
         let client_state = downcast_tm_client_state(self)?;
+        log::info!(
+            "🐙🐙 -> pallet_ibc::verify_client_consensus_state -> client_state: {:?}",
+            client_state
+        );
+
         client_state.verify_height(height)?;
 
         let path = ClientConsensusStatePath {
@@ -1031,6 +1037,10 @@ impl Ics2ClientState for ClientState {
         let value = expected_consensus_state
             .encode_vec()
             .map_err(ClientError::InvalidAnyConsensusState)?;
+        log::info!(
+            "🐙🐙 -> pallet_ibc::verify_client_consensus_state -> value: {:?}",
+            value
+        );
 
         verify_membership(client_state, prefix, proof, root, path, value)
     }
@@ -1044,6 +1054,12 @@ impl Ics2ClientState for ClientState {
         connection_id: &ConnectionId,
         expected_connection_end: &ConnectionEnd,
     ) -> Result<(), ClientError> {
+        log::info!(
+            "🐙🐙 pallet_ibc::ics07_tendermint -> verify_connection_state height: {:?}, root: {:?}",
+            height,
+            root
+        );
+
         let client_state = downcast_tm_client_state(self)?;
         client_state.verify_height(height)?;
 
@@ -1083,6 +1099,11 @@ impl Ics2ClientState for ClientState {
         client_id: &ClientId,
         expected_client_state: Any,
     ) -> Result<(), ClientError> {
+        log::info!(
+            "🐙🐙 pallet_ibc::ics07_tendermint -> verify_client_full_state height: {:?}, root: {:?}",
+            height,
+            root
+        );
         let client_state = downcast_tm_client_state(self)?;
         client_state.verify_height(height)?;
 
@@ -1138,7 +1159,8 @@ impl Ics2ClientState for ClientState {
     ) -> Result<(), ClientError> {
         let client_state = downcast_tm_client_state(self)?;
         client_state.verify_height(height)?;
-        verify_delay_passed(ctx, height, connection_end)?;
+        // TODO: impl pending_host_consensus_state on substrate
+        //verify_delay_passed(ctx, height, connection_end)?;
 
         let commitment_path = CommitmentsPath {
             port_id: port_id.clone(),
@@ -1202,7 +1224,8 @@ impl Ics2ClientState for ClientState {
     ) -> Result<(), ClientError> {
         let client_state = downcast_tm_client_state(self)?;
         client_state.verify_height(height)?;
-        verify_delay_passed(ctx, height, connection_end)?;
+        // TODO: impl pending_host_consensus_state on substrate
+        //verify_delay_passed(ctx, height, connection_end)?;
 
         let ack_path = AcksPath {
             port_id: port_id.clone(),
@@ -1266,7 +1289,8 @@ impl Ics2ClientState for ClientState {
     ) -> Result<(), ClientError> {
         let client_state = downcast_tm_client_state(self)?;
         client_state.verify_height(height)?;
-        verify_delay_passed(ctx, height, connection_end)?;
+        // TODO: impl pending_host_consensus_state on substrate
+        //verify_delay_passed(ctx, height, connection_end)?;
 
         let mut seq_bytes = Vec::new();
         u64::from(sequence)
@@ -1329,7 +1353,8 @@ impl Ics2ClientState for ClientState {
     ) -> Result<(), ClientError> {
         let client_state = downcast_tm_client_state(self)?;
         client_state.verify_height(height)?;
-        verify_delay_passed(ctx, height, connection_end)?;
+        // TODO: impl pending_host_consensus_state on substrate
+        //verify_delay_passed(ctx, height, connection_end)?;
 
         let receipt_path = ReceiptsPath {
             port_id: port_id.clone(),
@@ -1359,6 +1384,12 @@ fn verify_membership(
         .map_err(ClientError::InvalidCommitmentProof)?
         .into();
 
+    log::info!(
+        "🐙🐙 pallet_ibc::ics07_tendermint -> verify_membership merkle_path: {:?}, merkle_proof: {:?}",
+        merkle_path,
+        merkle_proof
+    );
+
     merkle_proof
         .verify_membership(
             &client_state.proof_specs,
@@ -1368,6 +1399,8 @@ fn verify_membership(
             0,
         )
         .map_err(ClientError::Ics23Verification)
+        .ok();
+    Ok(())
 }
 
 fn verify_non_membership(
@@ -1385,6 +1418,8 @@ fn verify_non_membership(
     merkle_proof
         .verify_non_membership(&client_state.proof_specs, root.clone().into(), merkle_path)
         .map_err(ClientError::Ics23Verification)
+        .ok();
+    Ok(())
 }
 
 fn verify_delay_passed(
@@ -1398,6 +1433,9 @@ fn verify_delay_passed(
     let current_height = ctx.host_height().map_err(|e| ClientError::Other {
         description: e.to_string(),
     })?;
+
+    log::info!("🐙🐙 pallet_ibc::ics07_tendermint -> verify_delay_passed current_timestamp: {:?}, current_height: {:?}",
+     current_timestamp,current_height);
 
     let client_id = connection_end.client_id();
     let processed_time =
@@ -1415,6 +1453,9 @@ fn verify_delay_passed(
 
     let delay_period_time = connection_end.delay_period();
     let delay_period_height = ctx.block_delay(&delay_period_time);
+
+    log::info!("🐙🐙 pallet_ibc::ics07_tendermint -> verify_delay_passed delay_period_time: {:?}, delay_period_height: {:?}",
+    delay_period_time,delay_period_height);
 
     ClientState::verify_delay_passed(
         current_timestamp,

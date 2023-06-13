@@ -9,7 +9,7 @@ use crate::core::ics04_channel::packet::{PacketResult, Receipt, Sequence};
 use crate::core::ics24_host::identifier::{ChannelId, PortId};
 use crate::events::IbcEvent;
 use crate::handler::{HandlerOutput, HandlerResult};
-use crate::timestamp::Expiry;
+// use crate::timestamp::Expiry;
 
 #[cfg(feature = "val_exec_ctx")]
 pub(crate) use val_exec_ctx::*;
@@ -189,6 +189,8 @@ pub(crate) fn process<Ctx: ChannelReader>(
     ctx_b: &Ctx,
     msg: &MsgRecvPacket,
 ) -> HandlerResult<PacketResult, PacketError> {
+    log::info!("🐙🐙 pallet_ics20 ->recv_packet message : {:?} ", msg);
+
     let mut output = HandlerOutput::builder();
 
     let chan_end_on_b = ctx_b
@@ -233,10 +235,13 @@ pub(crate) fn process<Ctx: ChannelReader>(
         });
     }
 
-    let latest_timestamp = ChannelReader::host_timestamp(ctx_b).map_err(PacketError::Channel)?;
-    if let Expiry::Expired = latest_timestamp.check_expiry(&msg.packet.timeout_timestamp_on_b) {
-        return Err(PacketError::LowPacketTimestamp);
-    }
+    // TODO: impl pending consensus state
+    // let latest_timestamp = ChannelReader::host_timestamp(ctx_b).map_err(PacketError::Channel)?;
+    // log::info!("🐙🐙 pallet_ics20 ->recv_packet latest_timestamp: {:?},  msg.packet.timeout_timestamp_on_b: {:?}",
+    // latest_timestamp,msg.packet.timeout_timestamp_on_b);
+    // if let Expiry::Expired = latest_timestamp.check_expiry(&msg.packet.timeout_timestamp_on_b) {
+    //     return Err(PacketError::LowPacketTimestamp);
+    // }
 
     // Verify proofs
     {
@@ -280,6 +285,7 @@ pub(crate) fn process<Ctx: ChannelReader>(
             })
             .map_err(PacketError::Channel)?;
     }
+    // log::info!("🐙🐙 pallet_ics20 ->recv_packet verify_packet_data passed ! ");
 
     let result = if chan_end_on_b.order_matches(&Order::Ordered) {
         let next_seq_recv =
@@ -331,6 +337,7 @@ pub(crate) fn process<Ctx: ChannelReader>(
         chan_end_on_b.ordering,
         conn_id_on_b.clone(),
     )));
+    log::info!("🐙🐙 pallet_ics20 ->recv_packet output:{:?}", output);
 
     Ok(output.with_result(result))
 }
