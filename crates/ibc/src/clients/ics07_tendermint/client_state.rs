@@ -352,38 +352,38 @@ impl Ics2ClientState for ClientState {
         let header = TmHeader::try_from(header)?;
         let header_height = header.height();
 
-        let maybe_existing_consensus_state = {
-            let path_at_header_height = ClientConsensusStatePath::new(client_id, &header_height);
+        // let maybe_existing_consensus_state = {
+        //     let path_at_header_height = ClientConsensusStatePath::new(client_id, &header_height);
 
-            ctx.consensus_state(&path_at_header_height).ok()
-        };
+        //     ctx.consensus_state(&path_at_header_height).ok()
+        // };
 
-        if maybe_existing_consensus_state.is_some() {
-            // if we already had the header installed by a previous relayer
-            // then this is a no-op.
-            //
-            // Do nothing.
-        } else {
-            let new_consensus_state = TmConsensusState::from(header.clone()).into_box();
-            let new_client_state = self.clone().with_header(header)?.into_box();
+        // if maybe_existing_consensus_state.is_some() {
+        //     // if we already had the header installed by a previous relayer
+        //     // then this is a no-op.
+        //     //
+        //     // Do nothing.
+        // } else {
+        //     let new_consensus_state = TmConsensusState::from(header.clone()).into_box();
+        //     let new_client_state = self.clone().with_header(header)?.into_box();
 
-            ctx.store_update_time(
-                client_id.clone(),
-                new_client_state.latest_height(),
-                ctx.host_timestamp()?,
-            )?;
-            ctx.store_update_height(
-                client_id.clone(),
-                new_client_state.latest_height(),
-                ctx.host_height()?,
-            )?;
+        //     ctx.store_update_time(
+        //         client_id.clone(),
+        //         new_client_state.latest_height(),
+        //         ctx.host_timestamp()?,
+        //     )?;
+        //     ctx.store_update_height(
+        //         client_id.clone(),
+        //         new_client_state.latest_height(),
+        //         ctx.host_height()?,
+        //     )?;
 
-            ctx.store_consensus_state(
-                ClientConsensusStatePath::new(client_id, &new_client_state.latest_height()),
-                new_consensus_state,
-            )?;
-            ctx.store_client_state(ClientStatePath::new(client_id), new_client_state)?;
-        }
+        //     ctx.store_consensus_state(
+        //         ClientConsensusStatePath::new(client_id, &new_client_state.latest_height()),
+        //         new_consensus_state,
+        //     )?;
+        //     ctx.store_client_state(ClientStatePath::new(client_id), new_client_state)?;
+        // }
 
         let updated_heights = vec![header_height];
         Ok(updated_heights)
