@@ -67,10 +67,10 @@ impl ClientState {
             };
 
             let options = self.as_light_client_options()?;
-            let mut now = ctx.host_timestamp()?.into_tm_time().unwrap();
+            // let now = ctx.host_timestamp()?.into_tm_time().unwrap();
             // ===================================================
             // for test
-            now = header.signed_header.header.time;
+            let now = header.signed_header.header.time;
             // ===================================================
 
             // main header verification, delegated to the tendermint-light-client crate.
