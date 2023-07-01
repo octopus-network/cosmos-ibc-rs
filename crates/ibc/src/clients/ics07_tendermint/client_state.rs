@@ -372,23 +372,28 @@ impl Ics2ClientState for ClientState {
         ic_cdk::println!("update state =========== 5");
             let new_consensus_state = TmConsensusState::from(header.clone()).into_box();
             let new_client_state = self.clone().with_header(header)?.into_box();
+        ic_cdk::println!("update state =========== 6");
 
             ctx.store_update_time(
                 client_id.clone(),
                 new_client_state.latest_height(),
                 ctx.host_timestamp()?,
             )?;
+        ic_cdk::println!("update state =========== 7");
             ctx.store_update_height(
                 client_id.clone(),
                 new_client_state.latest_height(),
                 ctx.host_height()?,
             )?;
+        ic_cdk::println!("update state =========== 8");
 
             ctx.store_consensus_state(
                 ClientConsensusStatePath::new(client_id, &new_client_state.latest_height()),
                 new_consensus_state,
             )?;
+        ic_cdk::println!("update state =========== 9");
             ctx.store_client_state(ClientStatePath::new(client_id), new_client_state)?;
+        ic_cdk::println!("update state =========== 10");
         }
 
         let updated_heights = vec![header_height];
