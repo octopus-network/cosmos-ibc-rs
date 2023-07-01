@@ -349,7 +349,6 @@ impl Ics2ClientState for ClientState {
         client_id: &ClientId,
         header: Any,
     ) -> Result<Vec<Height>, ClientError> {
-        use ic_cdk;
 
         ic_cdk::println!("update state =========== 1");
         let header = TmHeader::try_from(header)?;
