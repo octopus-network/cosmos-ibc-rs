@@ -41,10 +41,6 @@ const TRANSFER_PORT_ID: &str = "transfer";
     derive(borsh::BorshSerialize, borsh::BorshDeserialize)
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(
-    feature = "serde",
-    serde(from = "tendermint::chain::Id", into = "tendermint::chain::Id")
-)]
 #[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ChainId {
     id: String,
@@ -165,18 +161,6 @@ impl Display for ChainId {
     }
 }
 
-impl From<ChainId> for tendermint::chain::Id {
-    fn from(id: ChainId) -> Self {
-        tendermint::chain::Id::from_str(id.as_str()).unwrap()
-    }
-}
-
-impl From<tendermint::chain::Id> for ChainId {
-    fn from(id: tendermint::chain::Id) -> Self {
-        ChainId::from(id.to_string())
-    }
-}
-
 impl Default for ChainId {
     fn default() -> Self {
         Self::from_string(DEFAULT_CHAIN_ID)
@@ -213,7 +197,8 @@ impl ClientId {
     /// ```
     /// # use ibc::core::ics24_host::identifier::ClientId;
     /// # use ibc::core::ics02_client::client_type::ClientType;
-    /// let tm_client_id = ClientId::new(ClientType::from("07-tendermint".to_string()), 0);
+    /// # use std::str::FromStr;
+    /// let tm_client_id = ClientId::new(ClientType::from_str("07-tendermint").unwrap(), 0);
     /// assert!(tm_client_id.is_ok());
     /// tm_client_id.map(|id| { assert_eq!(&id, "07-tendermint-0") });
     /// ```
@@ -252,7 +237,7 @@ impl FromStr for ClientId {
 
 impl Default for ClientId {
     fn default() -> Self {
-        Self::new(tm_client_type(), 0).unwrap()
+        Self::new(tm_client_type(), 0).expect("Never fails because we use a valid client type")
     }
 }
 
