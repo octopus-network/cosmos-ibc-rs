@@ -44,8 +44,6 @@ pub struct MsgConnectionOpenTry {
     pub consensus_height_of_b_on_a: Height,
     pub delay_period: Duration,
     pub signer: Signer,
-    /// optional proof data for host state machines that are unable to introspect their own consensus state
-    pub host_consensus_state_proof: CommitmentProofBytes,
 
     #[deprecated(since = "0.22.0")]
     /// Only kept here for proper conversion to/from the raw type
@@ -115,10 +113,6 @@ impl TryFrom<RawMsgConnectionOpenTry> for MsgConnectionOpenTry {
                 .ok_or(ConnectionError::MissingConsensusHeight)?,
             delay_period: Duration::from_nanos(msg.delay_period),
             signer: msg.signer.into(),
-            host_consensus_state_proof: msg
-                .host_consensus_state_proof
-                .try_into()
-                .map_err(|_| ConnectionError::InvalidProof)?,
         })
     }
 }
@@ -139,7 +133,6 @@ impl From<MsgConnectionOpenTry> for RawMsgConnectionOpenTry {
             proof_consensus: msg.proof_consensus_state_of_b_on_a.into(),
             consensus_height: Some(msg.consensus_height_of_b_on_a.into()),
             signer: msg.signer.to_string(),
-            host_consensus_state_proof: msg.host_consensus_state_proof.into(),
         }
     }
 }
