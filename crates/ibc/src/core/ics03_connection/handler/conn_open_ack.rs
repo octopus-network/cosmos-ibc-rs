@@ -81,6 +81,11 @@ where
                 vars.conn_end_on_a.delay_period(),
             )?;
 
+            ic_cdk::println!("prefix_on_b: {:?}", prefix_on_b);
+            ic_cdk::println!("proof_conn_end_on_b: {:?}", msg.proof_conn_end_on_b);
+            ic_cdk::println!("consensus_state_of_b_on_a root: {:?}", consensus_state_of_b_on_a.root());
+            ic_cdk::println!("Path::Connection(ConnectionPath::new(&msg.conn_id_on_b)): {:?}", Path::Connection(ConnectionPath::new(&msg.conn_id_on_b)));
+            ic_cdk::println!("expected_conn_end_on_b: {:?}", expected_conn_end_on_b.encode_vec());
             client_state_of_b_on_a
                 .verify_membership(
                     prefix_on_b,
