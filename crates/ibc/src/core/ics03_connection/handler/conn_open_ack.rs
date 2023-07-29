@@ -86,6 +86,7 @@ where
             ic_cdk::println!("consensus_state_of_b_on_a root: {:?}", consensus_state_of_b_on_a.root());
             ic_cdk::println!("Path::Connection(ConnectionPath::new(&msg.conn_id_on_b)): {:?}", Path::Connection(ConnectionPath::new(&msg.conn_id_on_b)));
             ic_cdk::println!("expected_conn_end_on_b: {:?}", expected_conn_end_on_b.encode_vec());
+            ic_cdk::println!("expected_conn_end_on_b 2: {:?}", expected_conn_end_on_b);
             client_state_of_b_on_a
                 .verify_membership(
                     prefix_on_b,
