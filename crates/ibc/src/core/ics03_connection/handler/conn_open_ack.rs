@@ -36,16 +36,16 @@ where
 {
     ctx_a.validate_message_signer(&msg.signer)?;
 
-    let host_height = ctx_a.host_height().map_err(|_| ConnectionError::Other {
-        description: "failed to get host height".to_string(),
-    })?;
-    if msg.consensus_height_of_a_on_b > host_height {
-        return Err(ConnectionError::InvalidConsensusHeight {
-            target_height: msg.consensus_height_of_a_on_b,
-            current_height: host_height,
-        }
-        .into());
-    }
+    // let host_height = ctx_a.host_height().map_err(|_| ConnectionError::Other {
+    //     description: "failed to get host height".to_string(),
+    // })?;
+    // if msg.consensus_height_of_a_on_b > host_height {
+    //     return Err(ConnectionError::InvalidConsensusHeight {
+    //         target_height: msg.consensus_height_of_a_on_b,
+    //         current_height: host_height,
+    //     }
+    //     .into());
+    // }
 
     ctx_a.validate_self_client(msg.client_state_of_a_on_b.clone())?;
 

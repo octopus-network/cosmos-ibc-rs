@@ -41,17 +41,17 @@ where
 
     ctx_b.validate_self_client(msg.client_state_of_b_on_a.clone())?;
 
-    let host_height = ctx_b.host_height().map_err(|_| ConnectionError::Other {
-        description: "failed to get host height".to_string(),
-    })?;
-    if msg.consensus_height_of_b_on_a > host_height {
-        // Fail if the consensus height is too advanced.
-        return Err(ConnectionError::InvalidConsensusHeight {
-            target_height: msg.consensus_height_of_b_on_a,
-            current_height: host_height,
-        }
-        .into());
-    }
+    // let host_height = ctx_b.host_height().map_err(|_| ConnectionError::Other {
+    //     description: "failed to get host height".to_string(),
+    // })?;
+    // if msg.consensus_height_of_b_on_a > host_height {
+    //     // Fail if the consensus height is too advanced.
+    //     return Err(ConnectionError::InvalidConsensusHeight {
+    //         target_height: msg.consensus_height_of_b_on_a,
+    //         current_height: host_height,
+    //     }
+    //     .into());
+    // }
 
     let client_id_on_a = msg.counterparty.client_id();
 
