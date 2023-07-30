@@ -20,6 +20,8 @@ use crate::core::router::ModuleId;
 use crate::core::timestamp::Expiry;
 use crate::core::{ContextError, ExecutionContext, ValidationContext};
 
+use crate::core::ics04_channel::acknowledgement::Acknowledgement;
+
 pub(crate) fn recv_packet_validate<ValCtx>(
     ctx_b: &ValCtx,
     msg: MsgRecvPacket,
@@ -36,7 +38,7 @@ where
 
 pub(crate) fn recv_packet_execute<ExecCtx>(
     ctx_b: &mut ExecCtx,
-    module_id: ModuleId,
+    _module_id: ModuleId,
     msg: MsgRecvPacket,
 ) -> Result<(), ContextError>
 where
@@ -74,11 +76,12 @@ where
         }
     }
 
-    let module = ctx_b
-        .get_route_mut(&module_id)
-        .ok_or(ChannelError::RouteNotFound)?;
+    // let module = ctx_b
+    //     .get_route_mut(&module_id)
+    //     .ok_or(ChannelError::RouteNotFound)?;
 
-    let (extras, acknowledgement) = module.on_recv_packet_execute(&msg.packet, &msg.signer);
+    // let (extras, acknowledgement) = module.on_recv_packet_execute(&msg.packet, &msg.signer);
+    let acknowledgement = Acknowledgement::try_from(vec![1u8]).expect("Never fails");
 
     // state changes
     {
@@ -134,13 +137,13 @@ where
         ctx_b.emit_ibc_event(IbcEvent::Message(MessageEvent::Channel));
         ctx_b.emit_ibc_event(event);
 
-        for module_event in extras.events {
-            ctx_b.emit_ibc_event(IbcEvent::Module(module_event));
-        }
+        // for module_event in extras.events {
+        //     ctx_b.emit_ibc_event(IbcEvent::Module(module_event));
+        // }
 
-        for log_message in extras.log {
-            ctx_b.log_message(log_message);
-        }
+        // for log_message in extras.log {
+        //     ctx_b.log_message(log_message);
+        // }
     }
 
     Ok(())

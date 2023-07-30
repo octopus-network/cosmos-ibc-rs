@@ -19,7 +19,7 @@ use crate::core::{ContextError, ExecutionContext, ValidationContext};
 
 pub(crate) fn chan_close_confirm_validate<ValCtx>(
     ctx_b: &ValCtx,
-    module_id: ModuleId,
+    _module_id: ModuleId,
     msg: MsgChannelCloseConfirm,
 ) -> Result<(), ContextError>
 where
@@ -27,26 +27,26 @@ where
 {
     validate(ctx_b, &msg)?;
 
-    let module = ctx_b
-        .get_route(&module_id)
-        .ok_or(ChannelError::RouteNotFound)?;
-    module.on_chan_close_confirm_validate(&msg.port_id_on_b, &msg.chan_id_on_b)?;
+    // let module = ctx_b
+    //     .get_route(&module_id)
+    //     .ok_or(ChannelError::RouteNotFound)?;
+    // module.on_chan_close_confirm_validate(&msg.port_id_on_b, &msg.chan_id_on_b)?;
 
     Ok(())
 }
 
 pub(crate) fn chan_close_confirm_execute<ExecCtx>(
     ctx_b: &mut ExecCtx,
-    module_id: ModuleId,
+    _module_id: ModuleId,
     msg: MsgChannelCloseConfirm,
 ) -> Result<(), ContextError>
 where
     ExecCtx: ExecutionContext,
 {
-    let module = ctx_b
-        .get_route_mut(&module_id)
-        .ok_or(ChannelError::RouteNotFound)?;
-    let extras = module.on_chan_close_confirm_execute(&msg.port_id_on_b, &msg.chan_id_on_b)?;
+    // let module = ctx_b
+    //     .get_route_mut(&module_id)
+    //     .ok_or(ChannelError::RouteNotFound)?;
+    // let extras = module.on_chan_close_confirm_execute(&msg.port_id_on_b, &msg.chan_id_on_b)?;
     let chan_end_path_on_b = ChannelEndPath::new(&msg.port_id_on_b, &msg.chan_id_on_b);
     let chan_end_on_b = ctx_b.channel_end(&chan_end_path_on_b)?;
 
@@ -88,13 +88,13 @@ where
         ctx_b.emit_ibc_event(IbcEvent::Message(MessageEvent::Channel));
         ctx_b.emit_ibc_event(core_event);
 
-        for module_event in extras.events {
-            ctx_b.emit_ibc_event(IbcEvent::Module(module_event));
-        }
+        // for module_event in extras.events {
+        //     ctx_b.emit_ibc_event(IbcEvent::Module(module_event));
+        // }
 
-        for log_message in extras.log {
-            ctx_b.log_message(log_message);
-        }
+        // for log_message in extras.log {
+        //     ctx_b.log_message(log_message);
+        // }
     }
 
     Ok(())
