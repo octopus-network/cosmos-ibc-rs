@@ -182,15 +182,15 @@ impl fmt::Debug for CommitmentPrefix {
     }
 }
 
-#[cfg(feature = "serde")]
-impl serde::Serialize for CommitmentPrefix {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        format!("{self:?}").serialize(serializer)
-    }
-}
+// #[cfg(feature = "serde")]
+// impl serde::Serialize for CommitmentPrefix {
+//     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+//     where
+//         S: serde::Serializer,
+//     {
+//         format!("{self:?}").serialize(serializer)
+//     }
+// }
 
 #[cfg(test)]
 pub mod test_util {
