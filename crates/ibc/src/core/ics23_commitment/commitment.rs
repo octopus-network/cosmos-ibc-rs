@@ -14,10 +14,10 @@ use super::merkle::MerkleProof;
 // #[cfg_attr(feature = "serde", serde(transparent))]
 #[derive(Clone, PartialEq, Eq)]
 pub struct CommitmentRoot {
-    #[cfg_attr(
-        feature = "serde",
-        serde(serialize_with = "crate::serializers::ser_hex_upper")
-    )]
+    // #[cfg_attr(
+    //     feature = "serde",
+    //     serde(serialize_with = "crate::serializers::ser_hex_upper")
+    // )]
     bytes: Vec<u8>,
 }
 
@@ -65,10 +65,10 @@ impl From<Vec<u8>> for CommitmentRoot {
 // #[cfg_attr(feature = "serde", serde(transparent))]
 #[derive(Clone, PartialEq, Eq)]
 pub struct CommitmentProofBytes {
-    #[cfg_attr(
-        feature = "serde",
-        serde(serialize_with = "crate::serializers::ser_hex_upper")
-    )]
+    // #[cfg_attr(
+    //     feature = "serde",
+    //     serde(serialize_with = "crate::serializers::ser_hex_upper")
+    // )]
     bytes: Vec<u8>,
 }
 
