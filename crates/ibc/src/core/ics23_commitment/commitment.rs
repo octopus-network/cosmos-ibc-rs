@@ -144,7 +144,7 @@ impl TryFrom<CommitmentProofBytes> for RawMerkleProof {
     feature = "borsh",
     derive(borsh::BorshSerialize, borsh::BorshDeserialize)
 )]
-#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, PartialEq, Eq, Hash, Default)]
 pub struct CommitmentPrefix {
     bytes: Vec<u8>,
