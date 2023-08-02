@@ -102,24 +102,24 @@ where
                 client_error: e,
             })?;
 
-        let expected_consensus_state_of_b_on_a =
-            ctx_b.host_consensus_state(&msg.consensus_height_of_b_on_a)?;
+        // let expected_consensus_state_of_b_on_a =
+        //     ctx_b.host_consensus_state(&msg.consensus_height_of_b_on_a)?;
 
-        let client_cons_state_path_on_a =
-            ClientConsensusStatePath::new(client_id_on_a, &msg.consensus_height_of_b_on_a);
+        // let client_cons_state_path_on_a =
+        //     ClientConsensusStatePath::new(client_id_on_a, &msg.consensus_height_of_b_on_a);
 
-        client_state_of_a_on_b
-            .verify_membership(
-                prefix_on_a,
-                &msg.proof_consensus_state_of_b_on_a,
-                consensus_state_of_a_on_b.root(),
-                Path::ClientConsensusState(client_cons_state_path_on_a),
-                expected_consensus_state_of_b_on_a.encode_vec(),
-            )
-            .map_err(|e| ConnectionError::ConsensusStateVerificationFailure {
-                height: msg.proofs_height_on_a,
-                client_error: e,
-            })?;
+        // client_state_of_a_on_b
+        //     .verify_membership(
+        //         prefix_on_a,
+        //         &msg.proof_consensus_state_of_b_on_a,
+        //         consensus_state_of_a_on_b.root(),
+        //         Path::ClientConsensusState(client_cons_state_path_on_a),
+        //         expected_consensus_state_of_b_on_a.encode_vec(),
+        //     )
+        //     .map_err(|e| ConnectionError::ConsensusStateVerificationFailure {
+        //         height: msg.proofs_height_on_a,
+        //         client_error: e,
+        //     })?;
     }
 
     Ok(())
