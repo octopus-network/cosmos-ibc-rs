@@ -37,6 +37,7 @@ pub enum PacketMsgType {
     derive(borsh::BorshSerialize, borsh::BorshDeserialize)
 )]
 #[derive(Clone, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Receipt {
     Ok,
 }
@@ -134,10 +135,10 @@ pub struct Packet {
     pub chan_id_on_a: ChannelId,
     pub port_id_on_b: PortId,
     pub chan_id_on_b: ChannelId,
-    #[cfg_attr(
-        feature = "serde",
-        serde(serialize_with = "crate::serializers::ser_hex_upper")
-    )]
+    // #[cfg_attr(
+    //     feature = "serde",
+    //     serde(serialize_with = "crate::serializers::ser_hex_upper")
+    // )]
     pub data: Vec<u8>,
     pub timeout_height_on_b: TimeoutHeight,
     pub timeout_timestamp_on_b: Timestamp,

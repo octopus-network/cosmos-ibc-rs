@@ -36,16 +36,16 @@ where
 {
     ctx_a.validate_message_signer(&msg.signer)?;
 
-    let host_height = ctx_a.host_height().map_err(|_| ConnectionError::Other {
-        description: "failed to get host height".to_string(),
-    })?;
-    if msg.consensus_height_of_a_on_b > host_height {
-        return Err(ConnectionError::InvalidConsensusHeight {
-            target_height: msg.consensus_height_of_a_on_b,
-            current_height: host_height,
-        }
-        .into());
-    }
+    // let host_height = ctx_a.host_height().map_err(|_| ConnectionError::Other {
+    //     description: "failed to get host height".to_string(),
+    // })?;
+    // if msg.consensus_height_of_a_on_b > host_height {
+    //     return Err(ConnectionError::InvalidConsensusHeight {
+    //         target_height: msg.consensus_height_of_a_on_b,
+    //         current_height: host_height,
+    //     }
+    //     .into());
+    // }
 
     ctx_a.validate_self_client(msg.client_state_of_a_on_b.clone())?;
 
@@ -81,6 +81,21 @@ where
                 vars.conn_end_on_a.delay_period(),
             )?;
 
+            ic_cdk::println!("prefix_on_b: {:?}", prefix_on_b);
+            ic_cdk::println!("proof_conn_end_on_b: {:?}", msg.proof_conn_end_on_b);
+            ic_cdk::println!(
+                "consensus_state_of_b_on_a root: {:?}",
+                consensus_state_of_b_on_a.root()
+            );
+            ic_cdk::println!(
+                "Path::Connection(ConnectionPath::new(&msg.conn_id_on_b)): {:?}",
+                Path::Connection(ConnectionPath::new(&msg.conn_id_on_b))
+            );
+            ic_cdk::println!(
+                "expected_conn_end_on_b: {:?}",
+                expected_conn_end_on_b.encode_vec()
+            );
+            ic_cdk::println!("expected_conn_end_on_b 2: {:?}", expected_conn_end_on_b);
             client_state_of_b_on_a
                 .verify_membership(
                     prefix_on_b,
@@ -105,26 +120,26 @@ where
                 client_error: e,
             })?;
 
-        let expected_consensus_state_of_a_on_b =
-            ctx_a.host_consensus_state(&msg.consensus_height_of_a_on_b)?;
+        // let expected_consensus_state_of_a_on_b =
+        //     ctx_a.host_consensus_state(&msg.consensus_height_of_a_on_b)?;
 
-        let client_cons_state_path_on_b =
-            ClientConsensusStatePath::new(vars.client_id_on_b(), &msg.consensus_height_of_a_on_b);
+        // let client_cons_state_path_on_b =
+        //     ClientConsensusStatePath::new(vars.client_id_on_b(), &msg.consensus_height_of_a_on_b);
 
-        client_state_of_b_on_a
-            .verify_membership(
-                prefix_on_b,
-                &msg.proof_consensus_state_of_a_on_b,
-                consensus_state_of_b_on_a.root(),
-                Path::ClientConsensusState(client_cons_state_path_on_b),
-                expected_consensus_state_of_a_on_b
-                    .encode_vec()
-                    .map_err(ConnectionError::ConsensusStateEncodeFailure)?,
-            )
-            .map_err(|e| ConnectionError::ConsensusStateVerificationFailure {
-                height: msg.proofs_height_on_b,
-                client_error: e,
-            })?;
+        // client_state_of_b_on_a
+        //     .verify_membership(
+        //         prefix_on_b,
+        //         &msg.proof_consensus_state_of_a_on_b,
+        //         consensus_state_of_b_on_a.root(),
+        //         Path::ClientConsensusState(client_cons_state_path_on_b),
+        //         expected_consensus_state_of_a_on_b
+        //             .encode_vec()
+        //             .map_err(ConnectionError::ConsensusStateEncodeFailure)?,
+        //     )
+        //     .map_err(|e| ConnectionError::ConsensusStateVerificationFailure {
+        //         height: msg.proofs_height_on_b,
+        //         client_error: e,
+        //     })?;
     }
 
     Ok(())

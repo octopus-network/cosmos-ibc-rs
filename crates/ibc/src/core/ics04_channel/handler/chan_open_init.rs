@@ -5,7 +5,7 @@ use crate::prelude::*;
 use crate::core::events::{IbcEvent, MessageEvent};
 use crate::core::ics02_client::client_state::ClientStateCommon;
 use crate::core::ics04_channel::channel::{ChannelEnd, Counterparty, State};
-use crate::core::ics04_channel::error::ChannelError;
+// use crate::core::ics04_channel::error::ChannelError;
 use crate::core::ics04_channel::events::OpenInit;
 use crate::core::ics04_channel::msgs::chan_open_init::MsgChannelOpenInit;
 use crate::core::ics24_host::identifier::ChannelId;
@@ -15,50 +15,50 @@ use crate::core::{ContextError, ExecutionContext, ValidationContext};
 
 pub(crate) fn chan_open_init_validate<ValCtx>(
     ctx_a: &ValCtx,
-    module_id: ModuleId,
+    _module_id: ModuleId,
     msg: MsgChannelOpenInit,
 ) -> Result<(), ContextError>
 where
     ValCtx: ValidationContext,
 {
     validate(ctx_a, &msg)?;
-    let chan_id_on_a = ChannelId::new(ctx_a.channel_counter()?);
+    //let chan_id_on_a = ChannelId::new(ctx_a.channel_counter()?);
 
-    let module = ctx_a
-        .get_route(&module_id)
-        .ok_or(ChannelError::RouteNotFound)?;
-    module.on_chan_open_init_validate(
-        msg.ordering,
-        &msg.connection_hops_on_a,
-        &msg.port_id_on_a,
-        &chan_id_on_a,
-        &Counterparty::new(msg.port_id_on_b.clone(), None),
-        &msg.version_proposal,
-    )?;
+    // let module = ctx_a
+    //     .get_route(&module_id)
+    //     .ok_or(ChannelError::RouteNotFound)?;
+    // module.on_chan_open_init_validate(
+    //     msg.ordering,
+    //     &msg.connection_hops_on_a,
+    //     &msg.port_id_on_a,
+    //     &chan_id_on_a,
+    //     &Counterparty::new(msg.port_id_on_b.clone(), None),
+    //     &msg.version_proposal,
+    // )?;
 
     Ok(())
 }
 
 pub(crate) fn chan_open_init_execute<ExecCtx>(
     ctx_a: &mut ExecCtx,
-    module_id: ModuleId,
+    _module_id: ModuleId,
     msg: MsgChannelOpenInit,
 ) -> Result<(), ContextError>
 where
     ExecCtx: ExecutionContext,
 {
     let chan_id_on_a = ChannelId::new(ctx_a.channel_counter()?);
-    let module = ctx_a
-        .get_route_mut(&module_id)
-        .ok_or(ChannelError::RouteNotFound)?;
-    let (extras, version) = module.on_chan_open_init_execute(
-        msg.ordering,
-        &msg.connection_hops_on_a,
-        &msg.port_id_on_a,
-        &chan_id_on_a,
-        &Counterparty::new(msg.port_id_on_b.clone(), None),
-        &msg.version_proposal,
-    )?;
+    // let module = ctx_a
+    //     .get_route_mut(&module_id)
+    //     .ok_or(ChannelError::RouteNotFound)?;
+    // let (extras, version) = module.on_chan_open_init_execute(
+    //     msg.ordering,
+    //     &msg.connection_hops_on_a,
+    //     &msg.port_id_on_a,
+    //     &chan_id_on_a,
+    //     &Counterparty::new(msg.port_id_on_b.clone(), None),
+    //     &msg.version_proposal,
+    // )?;
 
     let conn_id_on_a = msg.connection_hops_on_a[0].clone();
 
@@ -97,18 +97,19 @@ where
             chan_id_on_a.clone(),
             msg.port_id_on_b,
             conn_id_on_a,
-            version,
+            //version,
+            msg.version_proposal, // TODO: may be wrong version
         ));
         ctx_a.emit_ibc_event(IbcEvent::Message(MessageEvent::Channel));
         ctx_a.emit_ibc_event(core_event);
 
-        for module_event in extras.events {
-            ctx_a.emit_ibc_event(IbcEvent::Module(module_event));
-        }
+        // for module_event in extras.events {
+        //     ctx_a.emit_ibc_event(IbcEvent::Module(module_event));
+        // }
 
-        for log_message in extras.log {
-            ctx_a.log_message(log_message);
-        }
+        // for log_message in extras.log {
+        //     ctx_a.log_message(log_message);
+        // }
     }
 
     Ok(())

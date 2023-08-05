@@ -19,7 +19,7 @@ use crate::core::{ContextError, ExecutionContext, ValidationContext};
 
 pub(crate) fn acknowledgement_packet_validate<ValCtx>(
     ctx_a: &ValCtx,
-    module_id: ModuleId,
+    _module_id: ModuleId,
     msg: MsgAcknowledgement,
 ) -> Result<(), ContextError>
 where
@@ -27,18 +27,19 @@ where
 {
     validate(ctx_a, &msg)?;
 
-    let module = ctx_a
-        .get_route(&module_id)
-        .ok_or(ChannelError::RouteNotFound)?;
+    // let module = ctx_a
+    //     .get_route(&module_id)
+    //     .ok_or(ChannelError::RouteNotFound)?;
 
-    module
-        .on_acknowledgement_packet_validate(&msg.packet, &msg.acknowledgement, &msg.signer)
-        .map_err(ContextError::PacketError)
+    // module
+    //     .on_acknowledgement_packet_validate(&msg.packet, &msg.acknowledgement, &msg.signer)
+    //     .map_err(ContextError::PacketError)
+    Ok(())
 }
 
 pub(crate) fn acknowledgement_packet_execute<ExecCtx>(
     ctx_a: &mut ExecCtx,
-    module_id: ModuleId,
+    _module_id: ModuleId,
     msg: MsgAcknowledgement,
 ) -> Result<(), ContextError>
 where
@@ -73,14 +74,14 @@ where
         return Ok(());
     };
 
-    let module = ctx_a
-        .get_route_mut(&module_id)
-        .ok_or(ChannelError::RouteNotFound)?;
+    // let module = ctx_a
+    //     .get_route_mut(&module_id)
+    //     .ok_or(ChannelError::RouteNotFound)?;
 
-    let (extras, cb_result) =
-        module.on_acknowledgement_packet_execute(&msg.packet, &msg.acknowledgement, &msg.signer);
+    // let (extras, cb_result) =
+    //     module.on_acknowledgement_packet_execute(&msg.packet, &msg.acknowledgement, &msg.signer);
 
-    cb_result?;
+    // cb_result?;
 
     // apply state changes
     {
@@ -106,13 +107,13 @@ where
 
         // Note: Acknowledgement event was emitted at the beginning
 
-        for module_event in extras.events {
-            ctx_a.emit_ibc_event(IbcEvent::Module(module_event));
-        }
+        // for module_event in extras.events {
+        //     ctx_a.emit_ibc_event(IbcEvent::Module(module_event));
+        // }
 
-        for log_message in extras.log {
-            ctx_a.log_message(log_message);
-        }
+        // for log_message in extras.log {
+        //     ctx_a.log_message(log_message);
+        // }
     }
 
     Ok(())

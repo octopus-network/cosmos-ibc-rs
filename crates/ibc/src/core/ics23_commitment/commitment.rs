@@ -11,13 +11,13 @@ use super::merkle::MerkleProof;
 
 /// Encodes a commitment root; most often a Merkle tree root hash.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "serde", serde(transparent))]
+// #[cfg_attr(feature = "serde", serde(transparent))]
 #[derive(Clone, PartialEq, Eq)]
 pub struct CommitmentRoot {
-    #[cfg_attr(
-        feature = "serde",
-        serde(serialize_with = "crate::serializers::ser_hex_upper")
-    )]
+    // #[cfg_attr(
+    //     feature = "serde",
+    //     serde(serialize_with = "crate::serializers::ser_hex_upper")
+    // )]
     bytes: Vec<u8>,
 }
 
@@ -62,13 +62,13 @@ impl From<Vec<u8>> for CommitmentRoot {
 /// For example, in the case of a proof of membership in a Merkle tree,
 /// this encodes a Merkle proof.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "serde", serde(transparent))]
+// #[cfg_attr(feature = "serde", serde(transparent))]
 #[derive(Clone, PartialEq, Eq)]
 pub struct CommitmentProofBytes {
-    #[cfg_attr(
-        feature = "serde",
-        serde(serialize_with = "crate::serializers::ser_hex_upper")
-    )]
+    // #[cfg_attr(
+    //     feature = "serde",
+    //     serde(serialize_with = "crate::serializers::ser_hex_upper")
+    // )]
     bytes: Vec<u8>,
 }
 
@@ -144,7 +144,7 @@ impl TryFrom<CommitmentProofBytes> for RawMerkleProof {
     feature = "borsh",
     derive(borsh::BorshSerialize, borsh::BorshDeserialize)
 )]
-#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, PartialEq, Eq, Hash, Default)]
 pub struct CommitmentPrefix {
     bytes: Vec<u8>,
@@ -182,15 +182,15 @@ impl fmt::Debug for CommitmentPrefix {
     }
 }
 
-#[cfg(feature = "serde")]
-impl serde::Serialize for CommitmentPrefix {
-    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-    where
-        S: serde::Serializer,
-    {
-        format!("{self:?}").serialize(serializer)
-    }
-}
+// #[cfg(feature = "serde")]
+// impl serde::Serialize for CommitmentPrefix {
+//     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+//     where
+//         S: serde::Serializer,
+//     {
+//         format!("{self:?}").serialize(serializer)
+//     }
+// }
 
 #[cfg(test)]
 pub mod test_util {
