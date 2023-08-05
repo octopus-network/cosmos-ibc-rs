@@ -26,6 +26,9 @@ pub(crate) const TYPE_URL: &str = "/ibc.core.connection.v1.MsgConnectionOpenTry"
 pub struct MsgConnectionOpenTry {
     /// ClientId on B that the connection is being opened for
     pub client_id_on_b: ClientId,
+    #[deprecated(since = "0.22.0")]
+    /// Only kept here for proper conversion to/from the raw type
+    previous_connection_id: String,
     /// ClientState of client tracking chain B on chain A
     pub client_state_of_b_on_a: Any,
     /// ClientId, ConnectionId and prefix of chain A
@@ -44,10 +47,7 @@ pub struct MsgConnectionOpenTry {
     pub consensus_height_of_b_on_a: Height,
     pub delay_period: Duration,
     pub signer: Signer,
-
-    #[deprecated(since = "0.22.0")]
-    /// Only kept here for proper conversion to/from the raw type
-    previous_connection_id: String,
+    pub host_consensus_state_proof: Vec<u8>,
 }
 
 impl Msg for MsgConnectionOpenTry {
@@ -113,6 +113,7 @@ impl TryFrom<RawMsgConnectionOpenTry> for MsgConnectionOpenTry {
                 .ok_or(ConnectionError::MissingConsensusHeight)?,
             delay_period: Duration::from_nanos(msg.delay_period),
             signer: msg.signer.into(),
+            host_consensus_state_proof: msg.host_consensus_state_proof,
         })
     }
 }
@@ -133,6 +134,7 @@ impl From<MsgConnectionOpenTry> for RawMsgConnectionOpenTry {
             proof_consensus: msg.proof_consensus_state_of_b_on_a.into(),
             consensus_height: Some(msg.consensus_height_of_b_on_a.into()),
             signer: msg.signer.to_string(),
+            host_consensus_state_proof: msg.host_consensus_state_proof,
         }
     }
 }
