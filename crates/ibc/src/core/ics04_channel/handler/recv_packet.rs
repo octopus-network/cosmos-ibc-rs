@@ -20,7 +20,7 @@ use crate::core::router::ModuleId;
 use crate::core::timestamp::Expiry;
 use crate::core::{ContextError, ExecutionContext, ValidationContext};
 
-use crate::core::ics04_channel::acknowledgement::Acknowledgement;
+use crate::core::ics04_channel::packet::Acknowledgement;
 
 pub(crate) fn recv_packet_validate<ValCtx>(
     ctx_b: &ValCtx,

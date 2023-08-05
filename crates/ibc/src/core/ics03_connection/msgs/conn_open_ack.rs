@@ -36,7 +36,6 @@ pub struct MsgConnectionOpenAck {
     pub consensus_height_of_a_on_b: Height,
     pub version: Version,
     pub signer: Signer,
-    pub host_consensus_state_proof: Vec<u8>
 }
 
 impl Msg for MsgConnectionOpenAck {
@@ -90,7 +89,6 @@ impl TryFrom<RawMsgConnectionOpenAck> for MsgConnectionOpenAck {
                 .and_then(|raw_height| raw_height.try_into().ok())
                 .ok_or(ConnectionError::MissingConsensusHeight)?,
             signer: msg.signer.into(),
-            host_consensus_state_proof: msg.host_consensus_state_proof
         })
     }
 }
@@ -108,7 +106,6 @@ impl From<MsgConnectionOpenAck> for RawMsgConnectionOpenAck {
             consensus_height: Some(msg.consensus_height_of_a_on_b.into()),
             version: Some(msg.version.into()),
             signer: msg.signer.to_string(),
-            host_consensus_state_proof: msg.host_consensus_state_proof,
         }
     }
 }
