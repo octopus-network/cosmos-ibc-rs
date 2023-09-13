@@ -47,22 +47,18 @@ impl borsh::BorshSerialize for Amount {
 }
 #[cfg(feature = "borsh")]
 impl borsh::BorshDeserialize for Amount {
-    fn deserialize_reader<R: borsh::maybestd::io::Read>(
-        reader: &mut R,
-    ) -> borsh::maybestd::io::Result<Self> {
+    fn deserialize(reader: &mut &[u8]) -> borsh::maybestd::io::Result<Self> {
         const NUM_BYTES_IN_U64: usize = 8;
         const NUM_WORDS_IN_U256: usize = 4;
 
-        let mut buf = [0; 32];
-        let bytes_read = reader.read(&mut buf)?;
-        if bytes_read != 32 {
+        if reader.len() != 32 {
             return Err(borsh::maybestd::io::Error::new(
                 borsh::maybestd::io::ErrorKind::InvalidInput,
-                format!("Expected to read 32 bytes, read {bytes_read}"),
+                format!("Expected to read 32 bytes, read {:?}", reader),
             ));
         }
 
-        let words: Vec<u64> = buf
+        let words: Vec<u64> = reader
             .chunks_exact(NUM_BYTES_IN_U64)
             .map(|word| {
                 let word: [u8; NUM_BYTES_IN_U64] = word
