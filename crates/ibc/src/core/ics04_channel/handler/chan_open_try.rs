@@ -21,7 +21,7 @@ use crate::prelude::*;
 
 pub(crate) fn chan_open_try_validate<ValCtx>(
     ctx_b: &ValCtx,
-    module: &dyn Module,
+    _module: &dyn Module,
     msg: MsgChannelOpenTry,
 ) -> Result<(), ContextError>
 where
@@ -29,37 +29,37 @@ where
 {
     validate(ctx_b, &msg)?;
 
-    let chan_id_on_b = ChannelId::new(ctx_b.channel_counter()?);
+    // let chan_id_on_b = ChannelId::new(ctx_b.channel_counter()?);
 
-    module.on_chan_open_try_validate(
-        msg.ordering,
-        &msg.connection_hops_on_b,
-        &msg.port_id_on_b,
-        &chan_id_on_b,
-        &Counterparty::new(msg.port_id_on_a.clone(), Some(msg.chan_id_on_a.clone())),
-        &msg.version_supported_on_a,
-    )?;
+    // module.on_chan_open_try_validate(
+    //     msg.ordering,
+    //     &msg.connection_hops_on_b,
+    //     &msg.port_id_on_b,
+    //     &chan_id_on_b,
+    //     &Counterparty::new(msg.port_id_on_a.clone(), Some(msg.chan_id_on_a.clone())),
+    //     &msg.version_supported_on_a,
+    // )?;
 
     Ok(())
 }
 
 pub(crate) fn chan_open_try_execute<ExecCtx>(
     ctx_b: &mut ExecCtx,
-    module: &mut dyn Module,
+    _module: &mut dyn Module,
     msg: MsgChannelOpenTry,
 ) -> Result<(), ContextError>
 where
     ExecCtx: ExecutionContext,
 {
     let chan_id_on_b = ChannelId::new(ctx_b.channel_counter()?);
-    let (extras, version) = module.on_chan_open_try_execute(
-        msg.ordering,
-        &msg.connection_hops_on_b,
-        &msg.port_id_on_b,
-        &chan_id_on_b,
-        &Counterparty::new(msg.port_id_on_a.clone(), Some(msg.chan_id_on_a.clone())),
-        &msg.version_supported_on_a,
-    )?;
+    // let (extras, version) = module.on_chan_open_try_execute(
+    //     msg.ordering,
+    //     &msg.connection_hops_on_b,
+    //     &msg.port_id_on_b,
+    //     &chan_id_on_b,
+    //     &Counterparty::new(msg.port_id_on_a.clone(), Some(msg.chan_id_on_a.clone())),
+    //     &msg.version_supported_on_a,
+    // )?;
 
     let conn_id_on_b = msg.connection_hops_on_b[0].clone();
 
@@ -70,7 +70,7 @@ where
             msg.ordering,
             Counterparty::new(msg.port_id_on_a.clone(), Some(msg.chan_id_on_a.clone())),
             msg.connection_hops_on_b.clone(),
-            version.clone(),
+            msg.version_supported_on_a.clone(), // version.clone(), TODO: maybe wrong version
         )?;
 
         let chan_end_path_on_b = ChannelEndPath::new(&msg.port_id_on_b, &chan_id_on_b);
@@ -100,18 +100,18 @@ where
             msg.port_id_on_a.clone(),
             msg.chan_id_on_a.clone(),
             conn_id_on_b,
-            version,
+            msg.version_supported_on_a, // version, TODO: maybe wrong version
         ));
         ctx_b.emit_ibc_event(IbcEvent::Message(MessageEvent::Channel))?;
         ctx_b.emit_ibc_event(core_event)?;
 
-        for module_event in extras.events {
-            ctx_b.emit_ibc_event(IbcEvent::Module(module_event))?;
-        }
+        // for module_event in extras.events {
+        //     ctx_b.emit_ibc_event(IbcEvent::Module(module_event))?;
+        // }
 
-        for log_message in extras.log {
-            ctx_b.log_message(log_message)?;
-        }
+        // for log_message in extras.log {
+        //     ctx_b.log_message(log_message)?;
+        // }
     }
 
     Ok(())

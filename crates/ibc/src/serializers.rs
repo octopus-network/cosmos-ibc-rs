@@ -1,16 +1,16 @@
-use serde::ser::{Serialize, Serializer};
-use subtle_encoding::{Encoding, Hex};
+// use serde::ser::{Serialize, Serializer};
+// use subtle_encoding::{Encoding, Hex};
 
-pub fn ser_hex_upper<S, T>(data: T, serializer: S) -> Result<S::Ok, S::Error>
-where
-    S: Serializer,
-    T: AsRef<[u8]>,
-{
-    let hex = Hex::upper_case()
-        .encode_to_string(data)
-        .map_err(|e| serde::ser::Error::custom(alloc::format!("failed to serialize hex: {}", e)))?;
-    hex.serialize(serializer)
-}
+// pub fn ser_hex_upper<S, T>(data: T, serializer: S) -> Result<S::Ok, S::Error>
+// where
+//     S: Serializer,
+//     T: AsRef<[u8]>,
+// {
+//     let hex = Hex::upper_case()
+//         .encode_to_string(data)
+//         .map_err(|e| serde::ser::Error::custom(alloc::format!("failed to serialize hex: {}", e)))?;
+//     hex.serialize(serializer)
+// }
 
 pub mod serde_string {
     use core::fmt::Display;
@@ -48,7 +48,9 @@ pub mod serde_string {
 pub mod tests {
     use serde::de::DeserializeOwned;
 
-    use super::*;
+    // use super::*;
+
+    use serde::ser::Serialize;
 
     pub fn test_serialization_roundtrip<T>(json_data: &str)
     where

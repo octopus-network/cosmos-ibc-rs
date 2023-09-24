@@ -14,44 +14,44 @@ use crate::prelude::*;
 
 pub(crate) fn chan_open_init_validate<ValCtx>(
     ctx_a: &ValCtx,
-    module: &dyn Module,
+    _module: &dyn Module,
     msg: MsgChannelOpenInit,
 ) -> Result<(), ContextError>
 where
     ValCtx: ValidationContext,
 {
     validate(ctx_a, &msg)?;
-    let chan_id_on_a = ChannelId::new(ctx_a.channel_counter()?);
+    // let chan_id_on_a = ChannelId::new(ctx_a.channel_counter()?);
 
-    module.on_chan_open_init_validate(
-        msg.ordering,
-        &msg.connection_hops_on_a,
-        &msg.port_id_on_a,
-        &chan_id_on_a,
-        &Counterparty::new(msg.port_id_on_b.clone(), None),
-        &msg.version_proposal,
-    )?;
+    // module.on_chan_open_init_validate(
+    //     msg.ordering,
+    //     &msg.connection_hops_on_a,
+    //     &msg.port_id_on_a,
+    //     &chan_id_on_a,
+    //     &Counterparty::new(msg.port_id_on_b.clone(), None),
+    //     &msg.version_proposal,
+    // )?;
 
     Ok(())
 }
 
 pub(crate) fn chan_open_init_execute<ExecCtx>(
     ctx_a: &mut ExecCtx,
-    module: &mut dyn Module,
+    _module: &mut dyn Module,
     msg: MsgChannelOpenInit,
 ) -> Result<(), ContextError>
 where
     ExecCtx: ExecutionContext,
 {
     let chan_id_on_a = ChannelId::new(ctx_a.channel_counter()?);
-    let (extras, version) = module.on_chan_open_init_execute(
-        msg.ordering,
-        &msg.connection_hops_on_a,
-        &msg.port_id_on_a,
-        &chan_id_on_a,
-        &Counterparty::new(msg.port_id_on_b.clone(), None),
-        &msg.version_proposal,
-    )?;
+    // let (extras, version) = module.on_chan_open_init_execute(
+    //     msg.ordering,
+    //     &msg.connection_hops_on_a,
+    //     &msg.port_id_on_a,
+    //     &chan_id_on_a,
+    //     &Counterparty::new(msg.port_id_on_b.clone(), None),
+    //     &msg.version_proposal,
+    // )?;
 
     let conn_id_on_a = msg.connection_hops_on_a[0].clone();
 
@@ -90,18 +90,18 @@ where
             chan_id_on_a.clone(),
             msg.port_id_on_b,
             conn_id_on_a,
-            version,
+            msg.version_proposal, // version, TODO: maybe wrong version
         ));
         ctx_a.emit_ibc_event(IbcEvent::Message(MessageEvent::Channel))?;
         ctx_a.emit_ibc_event(core_event)?;
 
-        for module_event in extras.events {
-            ctx_a.emit_ibc_event(IbcEvent::Module(module_event))?;
-        }
+        // for module_event in extras.events {
+        //     ctx_a.emit_ibc_event(IbcEvent::Module(module_event))?;
+        // }
 
-        for log_message in extras.log {
-            ctx_a.log_message(log_message)?;
-        }
+        // for log_message in extras.log {
+        //     ctx_a.log_message(log_message)?;
+        // }
     }
 
     Ok(())
