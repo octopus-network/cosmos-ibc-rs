@@ -62,7 +62,7 @@ impl Msg for MsgConnectionOpenTry {
 #[allow(deprecated)]
 #[cfg(feature = "borsh")]
 mod borsh_impls {
-    use borsh::maybestd::io;
+    use borsh::io::{self, Read};
     use borsh::{BorshDeserialize, BorshSerialize};
 
     use super::*;
@@ -129,8 +129,8 @@ mod borsh_impls {
     }
 
     impl BorshDeserialize for MsgConnectionOpenTry {
-        fn deserialize(reader: &mut &[u8]) -> borsh::maybestd::io::Result<Self> {
-            let inner = InnerMsgConnectionOpenTry::deserialize(reader)?;
+        fn deserialize_reader<R: Read>(reader: &mut R) -> borsh::io::Result<Self> {
+            let inner = InnerMsgConnectionOpenTry::deserialize_reader(reader)?;
 
             Ok(MsgConnectionOpenTry {
                 client_id_on_b: inner.client_id_on_b,

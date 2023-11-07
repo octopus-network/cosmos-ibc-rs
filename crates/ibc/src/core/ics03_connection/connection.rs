@@ -111,6 +111,8 @@ pub struct ConnectionEnd {
 }
 
 mod sealed {
+    use borsh::io::Read;
+
     use super::*;
 
     #[cfg_attr(
@@ -153,10 +155,7 @@ mod sealed {
 
     #[cfg(feature = "borsh")]
     impl borsh::BorshSerialize for ConnectionEnd {
-        fn serialize<W: borsh::maybestd::io::Write>(
-            &self,
-            writer: &mut W,
-        ) -> borsh::maybestd::io::Result<()> {
+        fn serialize<W: borsh::io::Write>(&self, writer: &mut W) -> borsh::io::Result<()> {
             let value = InnerConnectionEnd::from(self.clone());
             borsh::BorshSerialize::serialize(&value, writer)
         }
@@ -164,8 +163,8 @@ mod sealed {
 
     #[cfg(feature = "borsh")]
     impl borsh::BorshDeserialize for ConnectionEnd {
-        fn deserialize(reader: &mut &[u8]) -> borsh::maybestd::io::Result<Self> {
-            let inner_conn_end = InnerConnectionEnd::deserialize(reader)?;
+        fn deserialize_reader<R: Read>(reader: &mut R) -> borsh::io::Result<Self> {
+            let inner_conn_end = InnerConnectionEnd::deserialize_reader(reader)?;
             Ok(ConnectionEnd::from(inner_conn_end))
         }
     }
@@ -478,7 +477,8 @@ impl Counterparty {
 )]
 #[cfg_attr(
     feature = "borsh",
-    derive(borsh::BorshSerialize, borsh::BorshDeserialize)
+    derive(borsh::BorshSerialize, borsh::BorshDeserialize),
+    borsh(use_discriminant = false)
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]

@@ -3,6 +3,7 @@
 use core::ops::Deref;
 use core::str::FromStr;
 
+use borsh::io::{ErrorKind, Read};
 use derive_more::{Display, From, Into};
 use primitive_types::U256;
 
@@ -34,10 +35,7 @@ impl parity_scale_codec::WrapperTypeEncode for Amount {}
 
 #[cfg(feature = "borsh")]
 impl borsh::BorshSerialize for Amount {
-    fn serialize<W: borsh::maybestd::io::Write>(
-        &self,
-        writer: &mut W,
-    ) -> borsh::maybestd::io::Result<()> {
+    fn serialize<W: borsh::io::Write>(&self, writer: &mut W) -> borsh::io::Result<()> {
         // Note: a "word" is 8 bytes (i.e. a u64)
         let words = self.as_slice();
         let bytes: Vec<u8> = words.iter().flat_map(|word| word.to_be_bytes()).collect();
@@ -47,26 +45,32 @@ impl borsh::BorshSerialize for Amount {
 }
 #[cfg(feature = "borsh")]
 impl borsh::BorshDeserialize for Amount {
-    fn deserialize(reader: &mut &[u8]) -> borsh::maybestd::io::Result<Self> {
+    fn deserialize_reader<R: Read>(reader: &mut R) -> borsh::io::Result<Self> {
         const NUM_BYTES_IN_U64: usize = 8;
         const NUM_WORDS_IN_U256: usize = 4;
 
-        if reader.len() != 32 {
-            return Err(borsh::maybestd::io::Error::new(
-                borsh::maybestd::io::ErrorKind::InvalidInput,
-                format!("Expected to read 32 bytes, read {:?}", reader),
-            ));
+        // Use a bigger buffer to check that we read exactly 32 bytes
+        let mut bytes: [u8; 33] = [0; 33];
+        match reader.read(&mut bytes) {
+            Ok(size) => {
+                if size != 32 {
+                    return Err(borsh::io::Error::new(
+                        ErrorKind::InvalidInput,
+                        format!("Expected 32 bytes, but got {}", size),
+                    ));
+                }
+            }
+            Err(e) => return Err(e),
         }
-
-        let words: Vec<u64> = reader
-            .chunks_exact(NUM_BYTES_IN_U64)
-            .map(|word| {
-                let word: [u8; NUM_BYTES_IN_U64] = word
-                    .try_into()
-                    .expect("exact chunks of 8 bytes are expected to be 8 bytes");
-                u64::from_be_bytes(word)
-            })
-            .collect();
+        // We know that we read exactly 32 bytes, so we can safely convert to a u64 array
+        let mut words: Vec<u64> = Vec::new();
+        for index in 0..4 {
+            let word: [u8; NUM_BYTES_IN_U64] = bytes
+                [index * NUM_BYTES_IN_U64..(index + 1) * NUM_BYTES_IN_U64]
+                .try_into()
+                .expect("exact chunks of 8 bytes are expected to be 8 bytes");
+            words.push(u64::from_be_bytes(word));
+        }
 
         let four_words: [u64; NUM_WORDS_IN_U256] = words
             .try_into()
@@ -148,9 +152,10 @@ mod tests {
     #[cfg(feature = "borsh")]
     #[test]
     fn borsh_amount() {
+        use core::str::FromStr;
         use borsh::BorshDeserialize;
 
-        let value = Amount::from(42);
+        let value = Amount::from_str("1000000000000000000000000").unwrap();
         let serialized = borsh::to_vec(&value).unwrap();
 
         // Amount is supposed to be a U256 according to the spec, which is 32 bytes
