@@ -12,4 +12,4 @@ exclude = [
 ]
 
 [patch.crates-io]
-ibc-proto = { git = "https://github.com/octopus-network/ibc-proto-rs.git", branch = "down-borsh-version" }
+ibc-proto = { git = "https://github.com/octopus-network/ibc-proto-rs.git", branch = "upgrade-borsh-version" }
