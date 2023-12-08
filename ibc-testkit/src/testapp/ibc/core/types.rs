@@ -520,14 +520,15 @@ impl MockContext {
                     })
                     .collect();
 
-                let client_state: TmClientState = TmClientStateConfig::builder()
-                    .chain_id(client.client_chain_id)
-                    .latest_height(client.client_state_height)
-                    .trusting_period(client.trusting_period)
-                    .max_clock_drift(client.max_clock_drift)
-                    .build()
-                    .try_into()
-                    .expect("never fails");
+                let client_state: TmClientState<tendermint::crypto::default::signature::Verifier> =
+                    TmClientStateConfig::builder()
+                        .chain_id(client.client_chain_id)
+                        .latest_height(client.client_state_height)
+                        .trusting_period(client.trusting_period)
+                        .max_clock_drift(client.max_clock_drift)
+                        .build()
+                        .try_into()
+                        .expect("never fails");
 
                 client_state.inner().validate().expect("never fails");
 

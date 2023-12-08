@@ -17,12 +17,16 @@ use ibc::core::primitives::prelude::*;
 use tendermint::block::Header as TmHeader;
 
 /// Returns a dummy tendermint `ClientState` by given `frozen_height`, for testing purposes only!
-pub fn dummy_tm_client_state_from_raw(frozen_height: RawHeight) -> Result<TmClientState, Error> {
+pub fn dummy_tm_client_state_from_raw(
+    frozen_height: RawHeight,
+) -> Result<TmClientState<tendermint::crypto::default::signature::Verifier>, Error> {
     ClientStateType::try_from(dummy_raw_tm_client_state(frozen_height)).map(TmClientState::from)
 }
 
 /// Returns a dummy tendermint `ClientState` from a `TmHeader`, for testing purposes only!
-pub fn dummy_tm_client_state_from_header(tm_header: TmHeader) -> TmClientState {
+pub fn dummy_tm_client_state_from_header(
+    tm_header: TmHeader,
+) -> TmClientState<tendermint::crypto::default::signature::Verifier> {
     let chain_id = ChainId::from_str(tm_header.chain_id.as_str()).expect("Never fails");
     let client_state = ClientStateType::new(
         chain_id.clone(),
@@ -84,7 +88,9 @@ pub struct ClientStateConfig {
     allow_update: AllowUpdate,
 }
 
-impl TryFrom<ClientStateConfig> for TmClientState {
+impl TryFrom<ClientStateConfig>
+    for TmClientState<tendermint::crypto::default::signature::Verifier>
+{
     type Error = ClientError;
 
     fn try_from(config: ClientStateConfig) -> Result<Self, Self::Error> {

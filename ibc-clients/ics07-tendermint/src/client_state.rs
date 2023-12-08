@@ -49,23 +49,37 @@ mod update_client;
 /// `ibc::core::client::context` on the `ClientState` type.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Clone, Debug, PartialEq)]
-pub struct ClientState(ClientStateType);
+pub struct ClientState<V>(ClientStateType<V>)
+where
+    V: Clone + Default + tendermint::crypto::signature::Verifier;
 
-impl ClientState {
-    pub fn inner(&self) -> &ClientStateType {
+impl<V> ClientState<V>
+where
+    V: Clone + Default + tendermint::crypto::signature::Verifier,
+{
+    pub fn inner(&self) -> &ClientStateType<V> {
         &self.0
     }
 }
 
-impl From<ClientStateType> for ClientState {
-    fn from(client_state: ClientStateType) -> Self {
+impl<V> From<ClientStateType<V>> for ClientState<V>
+where
+    V: Clone + Default + tendermint::crypto::signature::Verifier,
+{
+    fn from(client_state: ClientStateType<V>) -> Self {
         Self(client_state)
     }
 }
 
-impl Protobuf<RawTmClientState> for ClientState {}
+impl<V> Protobuf<RawTmClientState> for ClientState<V> where
+    V: Clone + Default + tendermint::crypto::signature::Verifier
+{
+}
 
-impl TryFrom<RawTmClientState> for ClientState {
+impl<V> TryFrom<RawTmClientState> for ClientState<V>
+where
+    V: Clone + Default + tendermint::crypto::signature::Verifier,
+{
     type Error = Error;
 
     fn try_from(raw: RawTmClientState) -> Result<Self, Self::Error> {
@@ -73,15 +87,21 @@ impl TryFrom<RawTmClientState> for ClientState {
     }
 }
 
-impl From<ClientState> for RawTmClientState {
-    fn from(client_state: ClientState) -> Self {
+impl<V> From<ClientState<V>> for RawTmClientState
+where
+    V: Clone + Default + tendermint::crypto::signature::Verifier,
+{
+    fn from(client_state: ClientState<V>) -> Self {
         client_state.0.into()
     }
 }
 
-impl Protobuf<Any> for ClientState {}
+impl<V> Protobuf<Any> for ClientState<V> where V: Clone + Default + tendermint::crypto::signature::Verifier {}
 
-impl TryFrom<Any> for ClientState {
+impl<V> TryFrom<Any> for ClientState<V>
+where
+    V: Clone + Default + tendermint::crypto::signature::Verifier,
+{
     type Error = ClientError;
 
     fn try_from(raw: Any) -> Result<Self, Self::Error> {
@@ -89,13 +109,19 @@ impl TryFrom<Any> for ClientState {
     }
 }
 
-impl From<ClientState> for Any {
-    fn from(client_state: ClientState) -> Self {
+impl<V> From<ClientState<V>> for Any
+where
+    V: Clone + Default + tendermint::crypto::signature::Verifier,
+{
+    fn from(client_state: ClientState<V>) -> Self {
         client_state.0.into()
     }
 }
 
-impl ClientStateCommon for ClientState {
+impl<V> ClientStateCommon for ClientState<V>
+where
+    V: Clone + Default + tendermint::crypto::signature::Verifier,
+{
     fn verify_consensus_state(&self, consensus_state: Any) -> Result<(), ClientError> {
         let tm_consensus_state = TmConsensusState::try_from(consensus_state)?;
         if tm_consensus_state.root().is_empty() {
@@ -242,8 +268,9 @@ impl ClientStateCommon for ClientState {
     }
 }
 
-impl<V> ClientStateValidation<V> for ClientState
+impl<S, V> ClientStateValidation<V> for ClientState<S>
 where
+    S: Clone + Default + tendermint::crypto::signature::Verifier,
     V: ClientValidationContext + TmValidationContext,
     V::AnyConsensusState: TryInto<TmConsensusState>,
     ClientError: From<<V::AnyConsensusState as TryInto<TmConsensusState>>::Error>,
@@ -323,10 +350,11 @@ where
     }
 }
 
-impl<E> ClientStateExecution<E> for ClientState
+impl<E, S> ClientStateExecution<E> for ClientState<S>
 where
+    S: Clone + Default + tendermint::crypto::signature::Verifier,
     E: TmExecutionContext + ExecutionContext,
-    <E as ClientExecutionContext>::AnyClientState: From<ClientState>,
+    <E as ClientExecutionContext>::AnyClientState: From<ClientState<S>>,
     <E as ClientExecutionContext>::AnyConsensusState: From<TmConsensusState>,
 {
     fn initialise(
@@ -545,7 +573,14 @@ mod tests {
         struct Test {
             name: String,
             height: Height,
-            setup: Option<Box<dyn FnOnce(ClientState) -> ClientState>>,
+            setup: Option<
+                Box<
+                    dyn FnOnce(
+                        ClientState<tendermint::crypto::default::signature::Verifier>,
+                    )
+                        -> ClientState<tendermint::crypto::default::signature::Verifier>,
+                >,
+            >,
             want_pass: bool,
         }
 

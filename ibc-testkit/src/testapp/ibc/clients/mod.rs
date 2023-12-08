@@ -25,7 +25,7 @@ use crate::testapp::ibc::core::types::MockContext;
            ClientExecutionContext = MockContext)
 ]
 pub enum AnyClientState {
-    Tendermint(TmClientState),
+    Tendermint(TmClientState<tendermint::crypto::default::signature::Verifier>),
     Mock(MockClientState),
 }
 

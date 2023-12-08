@@ -12,7 +12,10 @@ use super::ClientState;
 use crate::consensus_state::ConsensusState as TmConsensusState;
 use crate::context::{CommonContext, ValidationContext as TmValidationContext};
 
-impl ClientState {
+impl<V> ClientState<V>
+where
+    V: Clone + Default + tendermint::crypto::signature::Verifier,
+{
     pub fn verify_header<ClientValidationContext>(
         &self,
         ctx: &ClientValidationContext,

@@ -10,7 +10,10 @@ use tendermint_light_client_verifier::Verifier;
 use super::{ClientState as TmClientState, TmValidationContext};
 use crate::consensus_state::ConsensusState as TmConsensusState;
 
-impl TmClientState {
+impl<V> TmClientState<V>
+where
+    V: Clone + Default + tendermint::crypto::signature::Verifier,
+{
     // verify_misbehaviour determines whether or not two conflicting headers at
     // the same height would have convinced the light client.
     pub fn verify_misbehaviour<ClientValidationContext>(
