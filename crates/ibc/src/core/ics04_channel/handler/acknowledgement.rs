@@ -5,12 +5,12 @@ use crate::core::ics02_client::error::ClientError;
 use crate::core::ics03_connection::connection::State as ConnectionState;
 use crate::core::ics03_connection::delay::verify_conn_delay_passed;
 use crate::core::ics04_channel::channel::{Counterparty, Order, State as ChannelState};
-use crate::core::ics04_channel::commitment::{compute_ack_commitment, compute_packet_commitment};
+use crate::core::ics04_channel::commitment::compute_ack_commitment;
 use crate::core::ics04_channel::error::{ChannelError, PacketError};
 use crate::core::ics04_channel::events::AcknowledgePacket;
 use crate::core::ics04_channel::msgs::acknowledgement::MsgAcknowledgement;
 use crate::core::ics24_host::path::{
-    AckPath, ChannelEndPath, ClientConsensusStatePath, CommitmentPath, Path, SeqAckPath,
+    AckPath, ChannelEndPath, ClientConsensusStatePath, Path, SeqAckPath,
 };
 use crate::core::router::Module;
 use crate::core::{ContextError, ExecutionContext, ValidationContext};
@@ -54,20 +54,20 @@ where
     ctx_a.emit_ibc_event(IbcEvent::Message(MessageEvent::Channel))?;
     ctx_a.emit_ibc_event(event)?;
 
-    let commitment_path_on_a = CommitmentPath::new(
-        &msg.packet.port_id_on_a,
-        &msg.packet.chan_id_on_a,
-        msg.packet.seq_on_a,
-    );
+    // let commitment_path_on_a = CommitmentPath::new(
+    //     &msg.packet.port_id_on_a,
+    //     &msg.packet.chan_id_on_a,
+    //     msg.packet.seq_on_a,
+    // );
 
-    // check if we're in the NO-OP case
-    if ctx_a.get_packet_commitment(&commitment_path_on_a).is_err() {
-        // This error indicates that the timeout has already been relayed
-        // or there is a misconfigured relayer attempting to prove a timeout
-        // for a packet never sent. Core IBC will treat this error as a no-op in order to
-        // prevent an entire relay transaction from failing and consuming unnecessary fees.
-        return Ok(());
-    };
+    // // check if we're in the NO-OP case
+    // if ctx_a.get_packet_commitment(&commitment_path_on_a).is_err() {
+    //     // This error indicates that the timeout has already been relayed
+    //     // or there is a misconfigured relayer attempting to prove a timeout
+    //     // for a packet never sent. Core IBC will treat this error as a no-op in order to
+    //     // prevent an entire relay transaction from failing and consuming unnecessary fees.
+    //     return Ok(());
+    // };
 
     // let (extras, cb_result) =
     //     module.on_acknowledgement_packet_execute(&msg.packet, &msg.acknowledgement, &msg.signer);
@@ -76,12 +76,12 @@ where
 
     // apply state changes
     {
-        let commitment_path_on_a = CommitmentPath {
-            port_id: msg.packet.port_id_on_a.clone(),
-            channel_id: msg.packet.chan_id_on_a.clone(),
-            sequence: msg.packet.seq_on_a,
-        };
-        ctx_a.delete_packet_commitment(&commitment_path_on_a)?;
+        // let commitment_path_on_a = CommitmentPath {
+        //     port_id: msg.packet.port_id_on_a.clone(),
+        //     channel_id: msg.packet.chan_id_on_a.clone(),
+        //     sequence: msg.packet.seq_on_a,
+        // };
+        // ctx_a.delete_packet_commitment(&commitment_path_on_a)?;
 
         if let Order::Ordered = chan_end_on_a.ordering {
             // Note: in validation, we verified that `msg.packet.sequence == nextSeqRecv`
@@ -134,32 +134,32 @@ where
 
     conn_end_on_a.verify_state_matches(&ConnectionState::Open)?;
 
-    let commitment_path_on_a =
-        CommitmentPath::new(&packet.port_id_on_a, &packet.chan_id_on_a, packet.seq_on_a);
+    // let commitment_path_on_a =
+    //     CommitmentPath::new(&packet.port_id_on_a, &packet.chan_id_on_a, packet.seq_on_a);
 
-    // Verify packet commitment
-    let commitment_on_a = match ctx_a.get_packet_commitment(&commitment_path_on_a) {
-        Ok(commitment_on_a) => commitment_on_a,
+    // // Verify packet commitment
+    // let commitment_on_a = match ctx_a.get_packet_commitment(&commitment_path_on_a) {
+    //     Ok(commitment_on_a) => commitment_on_a,
 
-        // This error indicates that the timeout has already been relayed
-        // or there is a misconfigured relayer attempting to prove a timeout
-        // for a packet never sent. Core IBC will treat this error as a no-op in order to
-        // prevent an entire relay transaction from failing and consuming unnecessary fees.
-        Err(_) => return Ok(()),
-    };
+    //     // This error indicates that the timeout has already been relayed
+    //     // or there is a misconfigured relayer attempting to prove a timeout
+    //     // for a packet never sent. Core IBC will treat this error as a no-op in order to
+    //     // prevent an entire relay transaction from failing and consuming unnecessary fees.
+    //     Err(_) => return Ok(()),
+    // };
 
-    if commitment_on_a
-        != compute_packet_commitment(
-            &packet.data,
-            &packet.timeout_height_on_b,
-            &packet.timeout_timestamp_on_b,
-        )
-    {
-        return Err(PacketError::IncorrectPacketCommitment {
-            sequence: packet.seq_on_a,
-        }
-        .into());
-    }
+    // if commitment_on_a
+    //     != compute_packet_commitment(
+    //         &packet.data,
+    //         &packet.timeout_height_on_b,
+    //         &packet.timeout_timestamp_on_b,
+    //     )
+    // {
+    //     return Err(PacketError::IncorrectPacketCommitment {
+    //         sequence: packet.seq_on_a,
+    //     }
+    //     .into());
+    // }
 
     if let Order::Ordered = chan_end_on_a.ordering {
         let seq_ack_path_on_a = SeqAckPath::new(&packet.port_id_on_a, &packet.chan_id_on_a);
