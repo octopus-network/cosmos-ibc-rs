@@ -15,7 +15,6 @@ use ibc_core_host::types::path::{
 use ibc_core_host::{ExecutionContext, ValidationContext};
 use ibc_core_router::module::Module;
 use ibc_primitives::prelude::*;
-use prost::Message;
 
 use super::timeout_on_close;
 
@@ -231,12 +230,16 @@ where
             let seq_recv_path_on_b =
                 SeqRecvPath::new(&msg.packet.port_id_on_b, &msg.packet.chan_id_on_b);
 
-            let mut value = Vec::new();
-            u64::from(msg.packet.seq_on_a)
-                .encode(&mut value)
-                .map_err(|_| PacketError::CannotEncodeSequence {
-                    sequence: msg.packet.seq_on_a,
-                })?;
+            // let mut value = Vec::new();
+            // u64::from(msg.packet.seq_on_a)
+            //     .encode(&mut value)
+            //     .map_err(|_| PacketError::CannotEncodeSequence {
+            //         sequence: msg.packet.seq_on_a,
+            //     })?;
+
+            // Note: We expect the return to be a u64 encoded in big-endian. Refer to ibc-go:
+            // https://github.com/cosmos/ibc-go/blob/25767f6bdb5bab2c2a116b41d92d753c93e18121/modules/core/04-channel/client/utils/utils.go#L191
+            let value = u64::from(msg.packet.seq_on_a).to_be_bytes().to_vec();
 
             client_state_of_b_on_a.verify_membership(
                 conn_end_on_a.counterparty().prefix(),
