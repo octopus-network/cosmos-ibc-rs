@@ -17,7 +17,7 @@ description  = """
 all-features = true
 
 [features]
-default = ["std"]
+default = ["std", "borsh"]
 std = [
     "ibc-proto/std",
     "ics23/std",
