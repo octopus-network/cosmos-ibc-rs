@@ -15,7 +15,6 @@ use ibc_core_host::types::path::{
 use ibc_core_host::{ExecutionContext, ValidationContext};
 use ibc_core_router::module::Module;
 use ibc_primitives::prelude::*;
-use prost::Message;
 
 use super::timeout_on_close;
 
@@ -26,7 +25,7 @@ pub enum TimeoutMsgType {
 
 pub fn timeout_packet_validate<ValCtx>(
     ctx_a: &ValCtx,
-    module: &dyn Module,
+    _module: &dyn Module,
     timeout_msg_type: TimeoutMsgType,
 ) -> Result<(), ContextError>
 where
@@ -37,25 +36,26 @@ where
         TimeoutMsgType::TimeoutOnClose(msg) => timeout_on_close::validate(ctx_a, msg),
     }?;
 
-    let (packet, signer) = match timeout_msg_type {
-        TimeoutMsgType::Timeout(msg) => (msg.packet, msg.signer),
-        TimeoutMsgType::TimeoutOnClose(msg) => (msg.packet, msg.signer),
-    };
+    // let (packet, signer) = match timeout_msg_type {
+    //     TimeoutMsgType::Timeout(msg) => (msg.packet, msg.signer),
+    //     TimeoutMsgType::TimeoutOnClose(msg) => (msg.packet, msg.signer),
+    // };
 
-    module
-        .on_timeout_packet_validate(&packet, &signer)
-        .map_err(ContextError::PacketError)
+    // module
+    //     .on_timeout_packet_validate(&packet, &signer)
+    //     .map_err(ContextError::PacketError)
+    Ok(())
 }
 
 pub fn timeout_packet_execute<ExecCtx>(
     ctx_a: &mut ExecCtx,
-    module: &mut dyn Module,
+    _module: &mut dyn Module,
     timeout_msg_type: TimeoutMsgType,
 ) -> Result<(), ContextError>
 where
     ExecCtx: ExecutionContext,
 {
-    let (packet, signer) = match timeout_msg_type {
+    let (packet, _signer) = match timeout_msg_type {
         TimeoutMsgType::Timeout(msg) => (msg.packet, msg.signer),
         TimeoutMsgType::TimeoutOnClose(msg) => (msg.packet, msg.signer),
     };
@@ -79,9 +79,9 @@ where
         return Ok(());
     };
 
-    let (extras, cb_result) = module.on_timeout_packet_execute(&packet, &signer);
+    // let (extras, cb_result) = module.on_timeout_packet_execute(&packet, &signer);
 
-    cb_result?;
+    // cb_result?;
 
     // apply state changes
     let chan_end_on_a = {
@@ -122,13 +122,13 @@ where
             ctx_a.emit_ibc_event(event)?;
         }
 
-        for module_event in extras.events {
-            ctx_a.emit_ibc_event(IbcEvent::Module(module_event))?;
-        }
+        // for module_event in extras.events {
+        //     ctx_a.emit_ibc_event(IbcEvent::Module(module_event))?;
+        // }
 
-        for log_message in extras.log {
-            ctx_a.log_message(log_message)?;
-        }
+        // for log_message in extras.log {
+        //     ctx_a.log_message(log_message)?;
+        // }
     }
 
     Ok(())
@@ -231,12 +231,7 @@ where
             let seq_recv_path_on_b =
                 SeqRecvPath::new(&msg.packet.port_id_on_b, &msg.packet.chan_id_on_b);
 
-            let mut value = Vec::new();
-            u64::from(msg.packet.seq_on_a)
-                .encode(&mut value)
-                .map_err(|_| PacketError::CannotEncodeSequence {
-                    sequence: msg.packet.seq_on_a,
-                })?;
+            let value = u64::from(msg.packet.seq_on_a).to_be_bytes().to_vec();
 
             client_state_of_b_on_a.verify_membership(
                 conn_end_on_a.counterparty().prefix(),

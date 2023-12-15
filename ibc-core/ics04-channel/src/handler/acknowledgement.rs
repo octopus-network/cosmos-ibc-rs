@@ -1,5 +1,5 @@
 use ibc_core_channel_types::channel::{Counterparty, Order, State as ChannelState};
-use ibc_core_channel_types::commitment::{compute_ack_commitment, compute_packet_commitment};
+use ibc_core_channel_types::commitment::compute_ack_commitment;
 use ibc_core_channel_types::error::{ChannelError, PacketError};
 use ibc_core_channel_types::events::AcknowledgePacket;
 use ibc_core_channel_types::msgs::MsgAcknowledgement;
@@ -11,7 +11,7 @@ use ibc_core_connection::types::State as ConnectionState;
 use ibc_core_handler_types::error::ContextError;
 use ibc_core_handler_types::events::{IbcEvent, MessageEvent};
 use ibc_core_host::types::path::{
-    AckPath, ChannelEndPath, ClientConsensusStatePath, CommitmentPath, Path, SeqAckPath,
+    AckPath, ChannelEndPath, ClientConsensusStatePath, Path, SeqAckPath,
 };
 use ibc_core_host::{ExecutionContext, ValidationContext};
 use ibc_core_router::module::Module;
@@ -19,7 +19,7 @@ use ibc_primitives::prelude::*;
 
 pub fn acknowledgement_packet_validate<ValCtx>(
     ctx_a: &ValCtx,
-    module: &dyn Module,
+    _module: &dyn Module,
     msg: MsgAcknowledgement,
 ) -> Result<(), ContextError>
 where
@@ -27,14 +27,15 @@ where
 {
     validate(ctx_a, &msg)?;
 
-    module
-        .on_acknowledgement_packet_validate(&msg.packet, &msg.acknowledgement, &msg.signer)
-        .map_err(ContextError::PacketError)
+    // module
+    //     .on_acknowledgement_packet_validate(&msg.packet, &msg.acknowledgement, &msg.signer)
+    //     .map_err(ContextError::PacketError)
+    Ok(())
 }
 
 pub fn acknowledgement_packet_execute<ExecCtx>(
     ctx_a: &mut ExecCtx,
-    module: &mut dyn Module,
+    _module: &mut dyn Module,
     msg: MsgAcknowledgement,
 ) -> Result<(), ContextError>
 where
@@ -54,34 +55,34 @@ where
     ctx_a.emit_ibc_event(IbcEvent::Message(MessageEvent::Channel))?;
     ctx_a.emit_ibc_event(event)?;
 
-    let commitment_path_on_a = CommitmentPath::new(
-        &msg.packet.port_id_on_a,
-        &msg.packet.chan_id_on_a,
-        msg.packet.seq_on_a,
-    );
+    // let commitment_path_on_a = CommitmentPath::new(
+    //     &msg.packet.port_id_on_a,
+    //     &msg.packet.chan_id_on_a,
+    //     msg.packet.seq_on_a,
+    // );
 
-    // check if we're in the NO-OP case
-    if ctx_a.get_packet_commitment(&commitment_path_on_a).is_err() {
-        // This error indicates that the timeout has already been relayed
-        // or there is a misconfigured relayer attempting to prove a timeout
-        // for a packet never sent. Core IBC will treat this error as a no-op in order to
-        // prevent an entire relay transaction from failing and consuming unnecessary fees.
-        return Ok(());
-    };
+    // // check if we're in the NO-OP case
+    // if ctx_a.get_packet_commitment(&commitment_path_on_a).is_err() {
+    //     // This error indicates that the timeout has already been relayed
+    //     // or there is a misconfigured relayer attempting to prove a timeout
+    //     // for a packet never sent. Core IBC will treat this error as a no-op in order to
+    //     // prevent an entire relay transaction from failing and consuming unnecessary fees.
+    //     return Ok(());
+    // };
 
-    let (extras, cb_result) =
-        module.on_acknowledgement_packet_execute(&msg.packet, &msg.acknowledgement, &msg.signer);
+    // let (extras, cb_result) =
+    //     module.on_acknowledgement_packet_execute(&msg.packet, &msg.acknowledgement, &msg.signer);
 
-    cb_result?;
+    // cb_result?;
 
     // apply state changes
     {
-        let commitment_path_on_a = CommitmentPath {
-            port_id: msg.packet.port_id_on_a.clone(),
-            channel_id: msg.packet.chan_id_on_a.clone(),
-            sequence: msg.packet.seq_on_a,
-        };
-        ctx_a.delete_packet_commitment(&commitment_path_on_a)?;
+        // let commitment_path_on_a = CommitmentPath {
+        //     port_id: msg.packet.port_id_on_a.clone(),
+        //     channel_id: msg.packet.chan_id_on_a.clone(),
+        //     sequence: msg.packet.seq_on_a,
+        // };
+        // ctx_a.delete_packet_commitment(&commitment_path_on_a)?;
 
         if let Order::Ordered = chan_end_on_a.ordering {
             // Note: in validation, we verified that `msg.packet.sequence == nextSeqRecv`
@@ -98,13 +99,13 @@ where
 
         // Note: Acknowledgement event was emitted at the beginning
 
-        for module_event in extras.events {
-            ctx_a.emit_ibc_event(IbcEvent::Module(module_event))?
-        }
+        // for module_event in extras.events {
+        //     ctx_a.emit_ibc_event(IbcEvent::Module(module_event))?
+        // }
 
-        for log_message in extras.log {
-            ctx_a.log_message(log_message)?;
-        }
+        // for log_message in extras.log {
+        //     ctx_a.log_message(log_message)?;
+        // }
     }
 
     Ok(())
@@ -134,32 +135,32 @@ where
 
     conn_end_on_a.verify_state_matches(&ConnectionState::Open)?;
 
-    let commitment_path_on_a =
-        CommitmentPath::new(&packet.port_id_on_a, &packet.chan_id_on_a, packet.seq_on_a);
+    // let commitment_path_on_a =
+    //     CommitmentPath::new(&packet.port_id_on_a, &packet.chan_id_on_a, packet.seq_on_a);
 
-    // Verify packet commitment
-    let commitment_on_a = match ctx_a.get_packet_commitment(&commitment_path_on_a) {
-        Ok(commitment_on_a) => commitment_on_a,
+    // // Verify packet commitment
+    // let commitment_on_a = match ctx_a.get_packet_commitment(&commitment_path_on_a) {
+    //     Ok(commitment_on_a) => commitment_on_a,
 
-        // This error indicates that the timeout has already been relayed
-        // or there is a misconfigured relayer attempting to prove a timeout
-        // for a packet never sent. Core IBC will treat this error as a no-op in order to
-        // prevent an entire relay transaction from failing and consuming unnecessary fees.
-        Err(_) => return Ok(()),
-    };
+    //     // This error indicates that the timeout has already been relayed
+    //     // or there is a misconfigured relayer attempting to prove a timeout
+    //     // for a packet never sent. Core IBC will treat this error as a no-op in order to
+    //     // prevent an entire relay transaction from failing and consuming unnecessary fees.
+    //     Err(_) => return Ok(()),
+    // };
 
-    if commitment_on_a
-        != compute_packet_commitment(
-            &packet.data,
-            &packet.timeout_height_on_b,
-            &packet.timeout_timestamp_on_b,
-        )
-    {
-        return Err(PacketError::IncorrectPacketCommitment {
-            sequence: packet.seq_on_a,
-        }
-        .into());
-    }
+    // if commitment_on_a
+    //     != compute_packet_commitment(
+    //         &packet.data,
+    //         &packet.timeout_height_on_b,
+    //         &packet.timeout_timestamp_on_b,
+    //     )
+    // {
+    //     return Err(PacketError::IncorrectPacketCommitment {
+    //         sequence: packet.seq_on_a,
+    //     }
+    //     .into());
+    // }
 
     if let Order::Ordered = chan_end_on_a.ordering {
         let seq_ack_path_on_a = SeqAckPath::new(&packet.port_id_on_a, &packet.chan_id_on_a);

@@ -74,10 +74,10 @@ pub struct Packet {
     pub chan_id_on_a: ChannelId,
     pub port_id_on_b: PortId,
     pub chan_id_on_b: ChannelId,
-    #[cfg_attr(
-        feature = "serde",
-        serde(serialize_with = "ibc_core_commitment_types::serializer::ser_hex_upper")
-    )]
+    // #[cfg_attr(
+    //     feature = "serde",
+    //     serde(serialize_with = "ibc_core_commitment_types::serializer::ser_hex_upper")
+    // )]
     pub data: Vec<u8>,
     pub timeout_height_on_b: TimeoutHeight,
     pub timeout_timestamp_on_b: Timestamp,
@@ -247,10 +247,10 @@ pub struct PacketState {
     pub port_id: PortId,
     pub chan_id: ChannelId,
     pub seq: Sequence,
-    #[cfg_attr(
-        feature = "serde",
-        serde(serialize_with = "ibc_core_commitment_types::serializer::ser_hex_upper")
-    )]
+    // #[cfg_attr(
+    //     feature = "serde",
+    //     serde(serialize_with = "ibc_core_commitment_types::serializer::ser_hex_upper")
+    // )]
     pub data: Vec<u8>,
 }
 impl core::fmt::Debug for PacketState {

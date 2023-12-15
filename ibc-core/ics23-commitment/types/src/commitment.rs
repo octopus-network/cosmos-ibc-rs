@@ -12,13 +12,13 @@ use crate::error::CommitmentError;
 
 /// Encodes a commitment root; most often a Merkle tree root hash.
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "serde", serde(transparent))]
+// #[cfg_attr(feature = "serde", serde(transparent))]
 #[derive(Clone, PartialEq, Eq)]
 pub struct CommitmentRoot {
-    #[cfg_attr(
-        feature = "serde",
-        serde(serialize_with = "crate::serializer::ser_hex_upper")
-    )]
+    // #[cfg_attr(
+    //     feature = "serde",
+    //     serde(serialize_with = "crate::serializer::ser_hex_upper")
+    // )]
     bytes: Vec<u8>,
 }
 
@@ -67,14 +67,14 @@ impl From<Vec<u8>> for CommitmentRoot {
     derive(borsh::BorshSerialize, borsh::BorshDeserialize)
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-#[cfg_attr(feature = "serde", serde(transparent))]
+// #[cfg_attr(feature = "serde", serde(transparent))]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Clone, PartialEq, Eq)]
 pub struct CommitmentProofBytes {
-    #[cfg_attr(
-        feature = "serde",
-        serde(serialize_with = "crate::serializer::ser_hex_upper")
-    )]
+    // #[cfg_attr(
+    //     feature = "serde",
+    //     serde(serialize_with = "crate::serializer::ser_hex_upper")
+    // )]
     bytes: Vec<u8>,
 }
 
