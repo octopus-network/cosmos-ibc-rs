@@ -134,14 +134,12 @@ where
             }
             let seq_recv_path_on_b = SeqRecvPath::new(&packet.port_id_on_b, &packet.chan_id_on_b);
 
-            let value = u64::from(packet.seq_on_a).to_be_bytes().to_vec();
-
             client_state_of_b_on_a.verify_membership(
                 conn_end_on_a.counterparty().prefix(),
                 &msg.proof_unreceived_on_b,
                 consensus_state_of_b_on_a.root(),
                 Path::SeqRecv(seq_recv_path_on_b),
-                value,
+                packet.seq_on_a.to_vec(),
             )
         } else {
             let receipt_path_on_b = ReceiptPath::new(
