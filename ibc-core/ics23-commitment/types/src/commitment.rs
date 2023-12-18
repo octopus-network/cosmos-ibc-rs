@@ -150,7 +150,7 @@ impl TryFrom<CommitmentProofBytes> for RawMerkleProof {
     feature = "borsh",
     derive(borsh::BorshSerialize, borsh::BorshDeserialize)
 )]
-#[cfg_attr(feature = "serde", derive(serde::Deserialize))]
+//#[cfg_attr(feature = "serde")]
 #[cfg_attr(feature = "schema", derive(schemars::JsonSchema))]
 #[derive(Clone, PartialEq, Eq, Hash, Default)]
 pub struct CommitmentPrefix {
@@ -196,5 +196,21 @@ impl serde::Serialize for CommitmentPrefix {
         S: serde::Serializer,
     {
         format!("{self:?}").serialize(serializer)
+    }
+}
+
+#[cfg(feature = "serde")]
+impl<'de> serde::Deserialize<'de> for CommitmentPrefix {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        Self::try_from(
+            <String>::deserialize(deserializer)?
+                .as_str()
+                .as_bytes()
+                .to_vec(),
+        )
+        .map_err(|e| serde::de::Error::custom(e.to_string()))
     }
 }
