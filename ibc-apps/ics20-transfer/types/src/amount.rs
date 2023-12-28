@@ -29,10 +29,7 @@ impl parity_scale_codec::WrapperTypeEncode for Amount {}
 
 #[cfg(feature = "borsh")]
 impl borsh::BorshSerialize for Amount {
-    fn serialize<W: borsh::io::Write>(
-        &self,
-        writer: &mut W,
-    ) -> borsh::io::Result<()> {
+    fn serialize<W: borsh::io::Write>(&self, writer: &mut W) -> borsh::io::Result<()> {
         // Note: a "word" is 8 bytes (i.e. a u64)
         let words = self.as_slice();
         let bytes: Vec<u8> = words.iter().flat_map(|word| word.to_be_bytes()).collect();
@@ -42,9 +39,7 @@ impl borsh::BorshSerialize for Amount {
 }
 #[cfg(feature = "borsh")]
 impl borsh::BorshDeserialize for Amount {
-    fn deserialize_reader<R: borsh::io::Read>(
-        reader: &mut R,
-    ) -> borsh::io::Result<Self> {
+    fn deserialize_reader<R: borsh::io::Read>(reader: &mut R) -> borsh::io::Result<Self> {
         const NUM_BYTES_IN_U64: usize = 8;
         const NUM_WORDS_IN_U256: usize = 4;
 

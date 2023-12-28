@@ -5,7 +5,7 @@ use ibc_core_channel_types::msgs::MsgTimeoutOnClose;
 use ibc_core_client::context::client_state::{ClientStateCommon, ClientStateValidation};
 use ibc_core_client::context::consensus_state::ConsensusState;
 use ibc_core_client::types::error::ClientError;
-use ibc_core_connection::delay::verify_conn_delay_passed;
+// use ibc_core_connection::delay::verify_conn_delay_passed;
 use ibc_core_handler_types::error::ContextError;
 use ibc_core_host::types::path::{
     ChannelEndPath, ClientConsensusStatePath, CommitmentPath, Path, ReceiptPath, SeqRecvPath,
@@ -122,7 +122,7 @@ where
             .map_err(ChannelError::VerifyChannelFailed)
             .map_err(PacketError::Channel)?;
 
-        verify_conn_delay_passed(ctx_a, msg.proof_height_on_b, &conn_end_on_a)?;
+        // verify_conn_delay_passed(ctx_a, msg.proof_height_on_b, &conn_end_on_a)?;
 
         let next_seq_recv_verification_result = if chan_end_on_a.order_matches(&Order::Ordered) {
             if packet.seq_on_a < msg.next_seq_recv_on_b {

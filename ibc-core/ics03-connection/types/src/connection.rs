@@ -153,10 +153,7 @@ mod sealed {
 
     #[cfg(feature = "borsh")]
     impl borsh::BorshSerialize for ConnectionEnd {
-        fn serialize<W: borsh::io::Write>(
-            &self,
-            writer: &mut W,
-        ) -> borsh::io::Result<()> {
+        fn serialize<W: borsh::io::Write>(&self, writer: &mut W) -> borsh::io::Result<()> {
             let value = InnerConnectionEnd::from(self.clone());
             borsh::BorshSerialize::serialize(&value, writer)
         }
@@ -164,9 +161,7 @@ mod sealed {
 
     #[cfg(feature = "borsh")]
     impl borsh::BorshDeserialize for ConnectionEnd {
-        fn deserialize_reader<R: borsh::io::Read>(
-            reader: &mut R,
-        ) -> borsh::io::Result<Self> {
+        fn deserialize_reader<R: borsh::io::Read>(reader: &mut R) -> borsh::io::Result<Self> {
             let inner_conn_end = InnerConnectionEnd::deserialize_reader(reader)?;
             Ok(ConnectionEnd::from(inner_conn_end))
         }
@@ -481,7 +476,7 @@ impl Counterparty {
 #[cfg_attr(
     feature = "borsh",
     derive(borsh::BorshSerialize, borsh::BorshDeserialize),
-    borsh(use_discriminant=false)
+    borsh(use_discriminant = false)
 )]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]

@@ -1,21 +1,16 @@
-use ibc_core_channel_types::acknowledgement::Acknowledgement;
-use ibc_core_channel_types::channel::{Counterparty, Order, State as ChannelState};
-use ibc_core_channel_types::commitment::{compute_ack_commitment, compute_packet_commitment};
+use ibc_core_channel_types::channel::{Counterparty, State as ChannelState};
+use ibc_core_channel_types::commitment::compute_packet_commitment;
 use ibc_core_channel_types::error::{ChannelError, PacketError};
-use ibc_core_channel_types::events::{ReceivePacket, WriteAcknowledgement};
+use ibc_core_channel_types::events::ReceivePacket;
 use ibc_core_channel_types::msgs::MsgRecvPacket;
-use ibc_core_channel_types::packet::Receipt;
 use ibc_core_client::context::client_state::{ClientStateCommon, ClientStateValidation};
 use ibc_core_client::context::consensus_state::ConsensusState;
 use ibc_core_client::types::error::ClientError;
-use ibc_core_connection::delay::verify_conn_delay_passed;
+// use ibc_core_connection::delay::verify_conn_delay_passed;
 use ibc_core_connection::types::State as ConnectionState;
 use ibc_core_handler_types::error::ContextError;
 use ibc_core_handler_types::events::{IbcEvent, MessageEvent};
-use ibc_core_host::types::path::{
-    AckPath, ChannelEndPath, ClientConsensusStatePath, CommitmentPath, Path, ReceiptPath,
-    SeqRecvPath,
-};
+use ibc_core_host::types::path::{ChannelEndPath, ClientConsensusStatePath, CommitmentPath, Path};
 use ibc_core_host::{ExecutionContext, ValidationContext};
 use ibc_core_router::module::Module;
 use ibc_primitives::prelude::*;
@@ -46,72 +41,71 @@ where
 
     // Check if another relayer already relayed the packet.
     // We don't want to fail the transaction in this case.
-    {
-        let packet_already_received = match chan_end_on_b.ordering {
-            // Note: ibc-go doesn't make the check for `Order::None` channels
-            Order::None => false,
-            Order::Unordered => {
-                let packet = &msg.packet;
-                let receipt_path_on_b =
-                    ReceiptPath::new(&packet.port_id_on_b, &packet.chan_id_on_b, packet.seq_on_a);
-                ctx_b.get_packet_receipt(&receipt_path_on_b).is_ok()
-            }
-            Order::Ordered => {
-                let seq_recv_path_on_b =
-                    SeqRecvPath::new(&msg.packet.port_id_on_b, &msg.packet.chan_id_on_b);
-                let next_seq_recv = ctx_b.get_next_sequence_recv(&seq_recv_path_on_b)?;
+    // {
+    //     let packet_already_received = match chan_end_on_b.ordering {
+    //         // Note: ibc-go doesn't make the check for `Order::None` channels
+    //         Order::None => false,
+    //         Order::Unordered => {
+    //             let packet = &msg.packet;
+    //             let receipt_path_on_b =
+    //                 ReceiptPath::new(&packet.port_id_on_b, &packet.chan_id_on_b, packet.seq_on_a);
+    //             ctx_b.get_packet_receipt(&receipt_path_on_b).is_ok()
+    //         }
+    //         Order::Ordered => {
+    //             let seq_recv_path_on_b =
+    //                 SeqRecvPath::new(&msg.packet.port_id_on_b, &msg.packet.chan_id_on_b);
+    //             let next_seq_recv = ctx_b.get_next_sequence_recv(&seq_recv_path_on_b)?;
 
-                // the sequence number has already been incremented, so
-                // another relayer already relayed the packet
-                msg.packet.seq_on_a < next_seq_recv
-            }
-        };
+    //             // the sequence number has already been incremented, so
+    //             // another relayer already relayed the packet
+    //             msg.packet.seq_on_a < next_seq_recv
+    //         }
+    //     };
 
-        if packet_already_received {
-            return Ok(());
-        }
-    }
+    //     if packet_already_received {
+    //         return Ok(());
+    //     }
+    // }
 
     // let (extras, acknowledgement) = module.on_recv_packet_execute(&msg.packet, &msg.signer);
-    let acknowledgement = Acknowledgement::try_from(vec![1u8]).expect("Never fails");
 
     // state changes
-    {
-        // `recvPacket` core handler state changes
-        match chan_end_on_b.ordering {
-            Order::Unordered => {
-                let receipt_path_on_b = ReceiptPath {
-                    port_id: msg.packet.port_id_on_b.clone(),
-                    channel_id: msg.packet.chan_id_on_b.clone(),
-                    sequence: msg.packet.seq_on_a,
-                };
+    // {
+    //     // `recvPacket` core handler state changes
+    //     match chan_end_on_b.ordering {
+    //         Order::Unordered => {
+    //             let receipt_path_on_b = ReceiptPath {
+    //                 port_id: msg.packet.port_id_on_b.clone(),
+    //                 channel_id: msg.packet.chan_id_on_b.clone(),
+    //                 sequence: msg.packet.seq_on_a,
+    //             };
 
-                ctx_b.store_packet_receipt(&receipt_path_on_b, Receipt::Ok)?;
-            }
-            Order::Ordered => {
-                let seq_recv_path_on_b =
-                    SeqRecvPath::new(&msg.packet.port_id_on_b, &msg.packet.chan_id_on_b);
-                let next_seq_recv = ctx_b.get_next_sequence_recv(&seq_recv_path_on_b)?;
-                ctx_b.store_next_sequence_recv(&seq_recv_path_on_b, next_seq_recv.increment())?;
-            }
-            _ => {}
-        }
-        let ack_path_on_b = AckPath::new(
-            &msg.packet.port_id_on_b,
-            &msg.packet.chan_id_on_b,
-            msg.packet.seq_on_a,
-        );
-        // `writeAcknowledgement` handler state changes
-        ctx_b.store_packet_acknowledgement(
-            &ack_path_on_b,
-            compute_ack_commitment(&acknowledgement),
-        )?;
-    }
+    //             ctx_b.store_packet_receipt(&receipt_path_on_b, Receipt::Ok)?;
+    //         }
+    //         Order::Ordered => {
+    //             let seq_recv_path_on_b =
+    //                 SeqRecvPath::new(&msg.packet.port_id_on_b, &msg.packet.chan_id_on_b);
+    //             let next_seq_recv = ctx_b.get_next_sequence_recv(&seq_recv_path_on_b)?;
+    //             ctx_b.store_next_sequence_recv(&seq_recv_path_on_b, next_seq_recv.increment())?;
+    //         }
+    //         _ => {}
+    //     }
+    //     let ack_path_on_b = AckPath::new(
+    //         &msg.packet.port_id_on_b,
+    //         &msg.packet.chan_id_on_b,
+    //         msg.packet.seq_on_a,
+    //     );
+    //     // `writeAcknowledgement` handler state changes
+    //     ctx_b.store_packet_acknowledgement(
+    //         &ack_path_on_b,
+    //         compute_ack_commitment(&acknowledgement),
+    //     )?;
+    // }
 
     // emit events and logs
     {
         ctx_b.log_message("success: packet receive".to_string())?;
-        ctx_b.log_message("success: packet write acknowledgement".to_string())?;
+        // ctx_b.log_message("success: packet write acknowledgement".to_string())?;
 
         let conn_id_on_b = &chan_end_on_b.connection_hops()[0];
         let event = IbcEvent::ReceivePacket(ReceivePacket::new(
@@ -121,13 +115,13 @@ where
         ));
         ctx_b.emit_ibc_event(IbcEvent::Message(MessageEvent::Channel))?;
         ctx_b.emit_ibc_event(event)?;
-        let event = IbcEvent::WriteAcknowledgement(WriteAcknowledgement::new(
-            msg.packet,
-            acknowledgement,
-            conn_id_on_b.clone(),
-        ));
-        ctx_b.emit_ibc_event(IbcEvent::Message(MessageEvent::Channel))?;
-        ctx_b.emit_ibc_event(event)?;
+        // let event = IbcEvent::WriteAcknowledgement(WriteAcknowledgement::new(
+        //     msg.packet,
+        //     acknowledgement,
+        //     conn_id_on_b.clone(),
+        // ));
+        // ctx_b.emit_ibc_event(IbcEvent::Message(MessageEvent::Channel))?;
+        // ctx_b.emit_ibc_event(event)?;
 
         // for module_event in extras.events {
         //     ctx_b.emit_ibc_event(IbcEvent::Module(module_event))?;
@@ -212,7 +206,7 @@ where
             msg.packet.seq_on_a,
         );
 
-        verify_conn_delay_passed(ctx_b, msg.proof_height_on_a, &conn_end_on_b)?;
+        // verify_conn_delay_passed(ctx_b, msg.proof_height_on_a, &conn_end_on_b)?;
 
         // Verify the proof for the packet against the chain store.
         client_state_of_a_on_b
@@ -230,56 +224,56 @@ where
             .map_err(PacketError::Channel)?;
     }
 
-    if chan_end_on_b.order_matches(&Order::Ordered) {
-        let seq_recv_path_on_b =
-            SeqRecvPath::new(&msg.packet.port_id_on_b, &msg.packet.chan_id_on_b);
-        let next_seq_recv = ctx_b.get_next_sequence_recv(&seq_recv_path_on_b)?;
-        if msg.packet.seq_on_a > next_seq_recv {
-            return Err(PacketError::InvalidPacketSequence {
-                given_sequence: msg.packet.seq_on_a,
-                next_sequence: next_seq_recv,
-            }
-            .into());
-        }
+    // if chan_end_on_b.order_matches(&Order::Ordered) {
+    //     let seq_recv_path_on_b =
+    //         SeqRecvPath::new(&msg.packet.port_id_on_b, &msg.packet.chan_id_on_b);
+    //     let next_seq_recv = ctx_b.get_next_sequence_recv(&seq_recv_path_on_b)?;
+    //     if msg.packet.seq_on_a > next_seq_recv {
+    //         return Err(PacketError::InvalidPacketSequence {
+    //             given_sequence: msg.packet.seq_on_a,
+    //             next_sequence: next_seq_recv,
+    //         }
+    //         .into());
+    //     }
 
-        if msg.packet.seq_on_a == next_seq_recv {
-            // Case where the recvPacket is successful and an
-            // acknowledgement will be written (not a no-op)
-            validate_write_acknowledgement(ctx_b, msg)?;
-        }
-    } else {
-        let receipt_path_on_b = ReceiptPath::new(
-            &msg.packet.port_id_on_a,
-            &msg.packet.chan_id_on_a,
-            msg.packet.seq_on_a,
-        );
-        let packet_rec = ctx_b.get_packet_receipt(&receipt_path_on_b);
-        match packet_rec {
-            Ok(_receipt) => {}
-            Err(ContextError::PacketError(PacketError::PacketReceiptNotFound { sequence }))
-                if sequence == msg.packet.seq_on_a => {}
-            Err(e) => return Err(e),
-        }
-        // Case where the recvPacket is successful and an
-        // acknowledgement will be written (not a no-op)
-        validate_write_acknowledgement(ctx_b, msg)?;
-    };
-
-    Ok(())
-}
-
-fn validate_write_acknowledgement<Ctx>(ctx_b: &Ctx, msg: &MsgRecvPacket) -> Result<(), ContextError>
-where
-    Ctx: ValidationContext,
-{
-    let packet = msg.packet.clone();
-    let ack_path_on_b = AckPath::new(&packet.port_id_on_b, &packet.chan_id_on_b, packet.seq_on_a);
-    if ctx_b.get_packet_acknowledgement(&ack_path_on_b).is_ok() {
-        return Err(PacketError::AcknowledgementExists {
-            sequence: msg.packet.seq_on_a,
-        }
-        .into());
-    }
+    //     if msg.packet.seq_on_a == next_seq_recv {
+    //         // Case where the recvPacket is successful and an
+    //         // acknowledgement will be written (not a no-op)
+    //         validate_write_acknowledgement(ctx_b, msg)?;
+    //     }
+    // } else {
+    //     let receipt_path_on_b = ReceiptPath::new(
+    //         &msg.packet.port_id_on_a,
+    //         &msg.packet.chan_id_on_a,
+    //         msg.packet.seq_on_a,
+    //     );
+    //     let packet_rec = ctx_b.get_packet_receipt(&receipt_path_on_b);
+    //     match packet_rec {
+    //         Ok(_receipt) => {}
+    //         Err(ContextError::PacketError(PacketError::PacketReceiptNotFound { sequence }))
+    //             if sequence == msg.packet.seq_on_a => {}
+    //         Err(e) => return Err(e),
+    //     }
+    //     // Case where the recvPacket is successful and an
+    //     // acknowledgement will be written (not a no-op)
+    //     validate_write_acknowledgement(ctx_b, msg)?;
+    // };
 
     Ok(())
 }
+
+// fn validate_write_acknowledgement<Ctx>(ctx_b: &Ctx, msg: &MsgRecvPacket) -> Result<(), ContextError>
+// where
+//     Ctx: ValidationContext,
+// {
+//     let packet = msg.packet.clone();
+//     let ack_path_on_b = AckPath::new(&packet.port_id_on_b, &packet.chan_id_on_b, packet.seq_on_a);
+//     if ctx_b.get_packet_acknowledgement(&ack_path_on_b).is_ok() {
+//         return Err(PacketError::AcknowledgementExists {
+//             sequence: msg.packet.seq_on_a,
+//         }
+//         .into());
+//     }
+//
+//     Ok(())
+// }

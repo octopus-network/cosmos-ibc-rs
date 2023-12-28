@@ -33,10 +33,7 @@ pub struct Timestamp {
 
 #[cfg(feature = "borsh")]
 impl borsh::BorshSerialize for Timestamp {
-    fn serialize<W: borsh::io::Write>(
-        &self,
-        writer: &mut W,
-    ) -> borsh::io::Result<()> {
+    fn serialize<W: borsh::io::Write>(&self, writer: &mut W) -> borsh::io::Result<()> {
         let timestamp = self.nanoseconds();
         borsh::BorshSerialize::serialize(&timestamp, writer)
     }
@@ -44,12 +41,9 @@ impl borsh::BorshSerialize for Timestamp {
 
 #[cfg(feature = "borsh")]
 impl borsh::BorshDeserialize for Timestamp {
-    fn deserialize_reader<R: borsh::io::Read>(
-        reader: &mut R,
-    ) -> borsh::io::Result<Self> {
+    fn deserialize_reader<R: borsh::io::Read>(reader: &mut R) -> borsh::io::Result<Self> {
         let timestamp = u64::deserialize_reader(reader)?;
-        Ok(Timestamp::from_nanoseconds(timestamp)
-            .map_err(|_| borsh::io::ErrorKind::Other)?)
+        Ok(Timestamp::from_nanoseconds(timestamp).map_err(|_| borsh::io::ErrorKind::Other)?)
     }
 }
 
