@@ -67,7 +67,9 @@ where
         };
 
         if packet_already_received {
-            return Ok(());
+            return Err(ContextError::PacketError(PacketError::Other {
+                description: format!("Packet already received, sequence: {}", msg.packet.seq_on_a),
+            }));
         }
     }
 
